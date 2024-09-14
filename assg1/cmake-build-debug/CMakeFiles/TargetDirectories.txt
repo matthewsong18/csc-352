@@ -1,0 +1,3 @@
+/Users/matthew/Documents/02 School/Classes/2024 Fall/csc-352/assignments/assg1/cmake-build-debug/CMakeFiles/assg1.dir
+/Users/matthew/Documents/02 School/Classes/2024 Fall/csc-352/assignments/assg1/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/matthew/Documents/02 School/Classes/2024 Fall/csc-352/assignments/assg1/cmake-build-debug/CMakeFiles/rebuild_cache.dir
