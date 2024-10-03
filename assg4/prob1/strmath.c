@@ -11,11 +11,13 @@
 
 void inputValidation(int, char **);
 
+void performMath(char **);
+
 void isWhitespace(char *);
 
 void isNonNumeric(char *);
 
-void hasLeadingZeros(char *);
+void hasLeadingZero(char *);
 
 int main(void) {
   // Input is 3 strings, one per line
@@ -69,9 +71,13 @@ void inputValidation(int lineNum, char **stringList) {
   isWhitespace(stringList[2]);
   isNonNumeric(stringList[1]);
   isNonNumeric(stringList[2]);
-  hasLeadingZeros(stringList[1]);
-  hasLeadingZeros(stringList[2]);
+  hasLeadingZero(stringList[1]);
+  hasLeadingZero(stringList[2]);
 }
+
+// void performMath(char **stringList) {
+
+// }
 
 void isWhitespace(char *line) {
   int isEmpty = strlen(line) == 0;
@@ -91,8 +97,15 @@ void isWhitespace(char *line) {
 
 void isNonNumeric(char *line) {
   for (int i = 0; line[i] != '\0'; ++i) {
+
+    if (i == 0 && strcmp(&line[0], "-") == 0) {
+      continue;
+    }
+
     if (isdigit(line[i]) == 0) {
-      fprintf(stderr, "Second and third strings must contain non-numeric characters.\n");
+      fprintf(
+          stderr,
+          "Second and third strings must contain non-numeric characters.\n");
       exit(1);
     }
   }
