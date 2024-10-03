@@ -1,0 +1,21 @@
+#!/bin/bash
+
+for test_file in test*; do
+    # 1: Run count program
+    ./strmath < "$test_file" > myOut 2> myErr
+
+    # 2: To myOut
+    echo $? >> myOut
+
+    # 3: Run program
+    ./exStrmath < "$test_file" > exOut 2> exErr
+
+    # 4: To exOut
+    echo $? >> exOut
+
+    # 5: Print test results
+    echo "Test File $test_file"
+    echo "stdout diffs:\n $(diff myOut exOut)"
+    echo "stderr diffs:\n $(diff myErr exErr)"
+    echo
+done
