@@ -13,6 +13,8 @@ void isWhitespace(char *);
 
 void inputValidation(int, char **);
 
+void isNonNumeric(char *);
+
 int main(void) {
   // Input is 3 strings, one per line
   char *stringList[3];
@@ -60,8 +62,11 @@ void inputValidation(int lineNum, char **stringList) {
     fprintf(stderr, "First string is not one of \"add\" or \"sub\".\n");
     exit(1);
   }
+
   isWhitespace(stringList[1]);
   isWhitespace(stringList[2]);
+  isNonNumeric(stringList[1]);
+  isNonNumeric(stringList[2]);
 }
 
 void isWhitespace(char *line) {
@@ -75,6 +80,15 @@ void isWhitespace(char *line) {
   for (int i = 0; line[i] != '\0'; ++i) {
     if (isspace(line[i])) {
       fprintf(stderr, "A line contains only whitespace.\n");
+      exit(1);
+    }
+  }
+}
+
+void isNonNumeric(char *line) {
+  for (int i = 0; line[i] != '\0'; ++i) {
+    if (isdigit(line[i]) == 0) {
+      fprintf(stderr, "Second and third strings must contain non-numeric characters.\n");
       exit(1);
     }
   }
