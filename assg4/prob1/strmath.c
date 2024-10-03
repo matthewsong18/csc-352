@@ -39,14 +39,14 @@ int main(void) {
 
   char *firstString = stringList[0];
 
-  int notAdd = !strcmp(firstString, "add");
-  int notSub = !strcmp(firstString, "sub");
-  printf("%s\n", firstString);
+  int notAdd = strcmp(firstString, "add") != 0;
+  int notSub = strcmp(firstString, "sub") != 0;
+  printf("%s", firstString);
   printf("%d\n", notAdd);
   printf("%d\n", notSub);
   
   if (notAdd || notSub) {
-    fprintf(stderr, "First string is not one of \"add\" or \"sub\".");
+    fprintf(stderr, "First string is not one of \"add\" or \"sub\".\n");
     exit(1);
   }
 
