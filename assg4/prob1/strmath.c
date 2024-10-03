@@ -17,7 +17,6 @@ int main(void) {
   int lineNum = 0;
 
   while (getline(&line, &linecap, stdin) != EOF) {
-    printf("%lu", strlen(line));
     stringList[lineNum] = malloc(strlen(line) + 1);
     if (stringList[lineNum] == NULL) {
       fprintf(stderr, "Out of memory\n");
@@ -27,14 +26,14 @@ int main(void) {
     strcpy(stringList[lineNum], line);
 
     ++lineNum;
-    printf("Line: %s", line);
+    printf("Line #%d: %s\n", lineNum - 1, line);
 
     if (lineNum == 3)
       break;
   }
 
   if (lineNum != 3) {
-    fprintf(stderr, "Not enough input strings");
+    fprintf(stderr, "Not enough input strings\n");
     exit(1);
   }
 
