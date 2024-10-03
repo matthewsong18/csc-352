@@ -9,11 +9,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-void isWhitespace(char *);
-
 void inputValidation(int, char **);
 
+void isWhitespace(char *);
+
 void isNonNumeric(char *);
+
+void hasLeadingZeros(char *);
 
 int main(void) {
   // Input is 3 strings, one per line
@@ -67,6 +69,8 @@ void inputValidation(int lineNum, char **stringList) {
   isWhitespace(stringList[2]);
   isNonNumeric(stringList[1]);
   isNonNumeric(stringList[2]);
+  hasLeadingZeros(stringList[1]);
+  hasLeadingZeros(stringList[2]);
 }
 
 void isWhitespace(char *line) {
@@ -91,5 +95,12 @@ void isNonNumeric(char *line) {
       fprintf(stderr, "Second and third strings must contain non-numeric characters.\n");
       exit(1);
     }
+  }
+}
+
+void hasLeadingZero(char *line) {
+  if (line[0] == 0 && strlen(line) != 1) {
+    fprintf(stderr, "Leading zeros are not allowed in numbers.\n");
+    exit(1);
   }
 }
