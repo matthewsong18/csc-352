@@ -31,8 +31,6 @@ int main(void) {
     strcpy(stringList[lineNum], line);
     stringList[lineNum][strcspn(stringList[lineNum], "\n")] = 0;
 
-    printf("%s", stringList[lineNum]);
-
     ++lineNum;
 
     if (lineNum == 3)
@@ -58,7 +56,7 @@ void inputValidation(int lineNum, char **stringList) {
   int notAdd = strcmp(firstString, "add") != 0;
   int notSub = strcmp(firstString, "sub") != 0;
 
-  if (notAdd || notSub) {
+  if (notAdd && notSub) {
     fprintf(stderr, "First string is not one of \"add\" or \"sub\".\n");
     exit(1);
   }
