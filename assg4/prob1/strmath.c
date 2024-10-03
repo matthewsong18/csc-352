@@ -4,9 +4,14 @@
  * Purpose: do math
  */
 
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+void isWhitespace(char *);
+
+void inputValidation(int, char **);
 
 int main(void) {
   // Input is 3 strings, one per line
@@ -24,13 +29,24 @@ int main(void) {
     }
 
     strcpy(stringList[lineNum], line);
+    stringList[lineNum][strcspn(stringList[lineNum], "\n")] = 0;
+
+    printf("%s", stringList[lineNum]);
 
     ++lineNum;
-    printf("Line #%d: %s\n", lineNum - 1, line);
 
     if (lineNum == 3)
       break;
   }
+
+  inputValidation(lineNum, stringList);
+
+  free(line);
+
+  return 0;
+}
+
+void inputValidation(int lineNum, char **stringList) {
 
   if (lineNum != 3) {
     fprintf(stderr, "Not enough input strings\n");
@@ -41,16 +57,27 @@ int main(void) {
 
   int notAdd = strcmp(firstString, "add") != 0;
   int notSub = strcmp(firstString, "sub") != 0;
-  printf("%s", firstString);
-  printf("%d\n", notAdd);
-  printf("%d\n", notSub);
-  
+
   if (notAdd || notSub) {
     fprintf(stderr, "First string is not one of \"add\" or \"sub\".\n");
     exit(1);
   }
+  isWhitespace(stringList[1]);
+  isWhitespace(stringList[2]);
+}
 
-  free(line);
+void isWhitespace(char *line) {
+  int isEmpty = strlen(line) == 0;
 
-  return 0;
+  if (isEmpty) {
+    fprintf(stderr, "A line contains only whitespace.\n");
+    exit(1);
+  }
+
+  for (int i = 0; line[i] != '\0'; ++i) {
+    if (isspace(line[i])) {
+      fprintf(stderr, "A line contains only whitespace.\n");
+      exit(1);
+    }
+  }
 }
