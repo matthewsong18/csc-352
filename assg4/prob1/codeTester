@@ -1,21 +1,27 @@
 #!/bin/bash
 
-for test_file in test*; do
-    # 1: Run count program
-    ./strmath < "$test_file" > myOut 2> myErr
+for test_file in test*.in; do
 
-    # 2: To myOut
-    echo $? >> myOut
+	test_name = "${test_file%.*}" 
 
-    # 3: Run program
-    ./exStrmath < "$test_file" > exOut 2> exErr
+    	# 1: Run count program
+       
+	./strmath < "$test_file" > "$test_name"Out 2> "$test_name"Err
+    
+	# 2: To myOut
 
-    # 4: To exOut
-    echo $? >> exOut
+    	echo $? >> "$test_file"Out
+    
+	# 3: Run program
+    
+	./exStrmath < "$test_file" > "$test_name"ExOut 2> "$test_name"ExErr
+    
+	# 4: To exOut
+    echo $? >> "$test_name"ExOut
 
     # 5: Print test results
-    echo "Test File $test_file"
-    echo "stdout diffs:\n $(diff myOut exOut)"
-    echo "stderr diffs:\n $(diff myErr exErr)"
-    echo
+    printf "Test File $test_file\n"
+    printf "stdout diffs: $(diff "$test_name"Out "$test_name"Err)\n"
+    printf "stderr diffs: $(diff "$test_name"ExOut "$test_name"ExErr)\n"
+    printf "\n"
 done
