@@ -57,6 +57,10 @@ int main(void) {
 
   free(line);
 
+  free(stringList[0]);
+  free(stringList[1]);
+  free(stringList[2]);
+
   exit(0);
 }
 
@@ -90,11 +94,11 @@ void performMath(char **stringList) {
   char *string1 = stringList[1];
   char *string2 = stringList[2];
 
-  // Max possible length is one more than longer number + one for terminator
+  // Max possible length is one more than longer number
   unsigned long lenStr1 = strlen(string1);
   unsigned long lenStr2 = strlen(string2);
 
-  int mathStrLen = max(lenStr1, lenStr2) + 2;
+  int mathStrLen = max(lenStr1, lenStr2) + 1;
   char *mathStr = calloc(mathStrLen, sizeof(int));
 
   if (mathStr == NULL) {
@@ -102,8 +106,7 @@ void performMath(char **stringList) {
     exit(1);
   }
 
-  int usableSpace = mathStrLen - 1;
-  mathStr[usableSpace] = '\0';
+  int usableSpace = mathStrLen;
 
   for (int i = 1; i < usableSpace; ++i) {
     int num1 = 0;
@@ -125,16 +128,59 @@ void performMath(char **stringList) {
     }
   }
 
-  int mathNum = 0;
-  for (int i = 0; i < mathStrLen - 1; ++i) {
-    mathNum *= 10;
-    mathNum += mathStr[i];
+  int unset = 1;
+  int negative = 0;
+  for (int i = 0; i < mathStrLen; ++i) {
+    printf("%s", mathStr);
+    
+    // Setting positive or negative mode
+    if (unset) {
+      if (mathStr[i] == 0)
+        continue;
+      else {
+        unset = 0;
+        if (mathStr[i] < 0)
+          negative = 1;
+        i = -1;
+        continue;
+      }
+    }
+
+    if (mathStr[i] == 0) {
+      continue;
+    }
+
+    if (negative) {
+      if (mathStr[i] > 0) {
+        mathStr[i - 1] += 1;
+        mathStr[i] = -10 + mathStr[i];
+        i -= 2;
+      }
+      continue;
+    }
+    // positive mode
+    else {
+      if (mathStr[i] < 0) {
+        mathStr[i - 1] -= 1;
+        mathStr[i] = 10 + mathStr[i];
+        i -= 2;
+      }
+      continue;
+    }
   }
 
-  printf("%d", mathNum);
-
+  int leadingZero = 1;
+  for (int i = 0; i < mathStrLen; ++i) {
+    if (mathStr[i] != 0) leadingZero = 0;
+    if (leadingZero) {
+      continue;
+    }
+    printf("%c", mathStr[i]);
+  }
   printf("\n");
   fflush(stdout);
+
+  free(mathStr);
 }
 
 void isWhitespace(char *line) {
@@ -157,9 +203,7 @@ void isNonNumeric(char *line) {
   for (int i = 0; line[i] != '\0'; ++i) {
 
     if (isdigit(line[i]) == 0) {
-      fprintf(
-          stderr,
-          "Second and third strings must contain non-numeric characters.\n");
+      fprintf(stderr, "Error: Non-integer characters in input\n");
       exit(1);
     }
   }
