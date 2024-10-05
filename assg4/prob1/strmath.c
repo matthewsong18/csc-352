@@ -21,7 +21,7 @@ void hasLeadingZero(char *);
 
 int max(int, int);
 
-int getDigit(int, int);
+int getDigit(int);
 
 int math(int, int, int);
 
@@ -52,6 +52,8 @@ int main(void) {
   inputValidation(lineNum, stringList);
 
   performMath(stringList);
+
+  fflush(stdout);
 
   free(line);
 
@@ -84,7 +86,7 @@ void inputValidation(int lineNum, char **stringList) {
 }
 
 void performMath(char **stringList) {
-  int isAdd = strcmp(stringList[0], "add") == 0;  
+  int isAdd = strcmp(stringList[0], "add") == 0;
   char *string1 = stringList[1];
   char *string2 = stringList[2];
 
@@ -103,24 +105,22 @@ void performMath(char **stringList) {
   int usableSpace = mathStrLen - 1;
   mathStr[usableSpace] = '\0';
 
-  int isNum1Neg = string1[0] == '-';
-  int isNum2Neg = string2[0] == '-';
-
   for (int i = 1; i < usableSpace; ++i) {
     int num1 = 0;
     int num2 = 0;
 
     if (lenStr1 >= i) {
-      num1 = getDigit(isNum1Neg, string1[lenStr1 - i]);
+      num1 = getDigit(string1[lenStr1 - i]);
     }
     if (lenStr2 >= i) {
-      num2 = getDigit(isNum2Neg, string2[lenStr2 - i]);
+      num2 = getDigit(string2[lenStr2 - i]);
     }
 
-    mathStr[usableSpace - i] = mathStr[usableSpace - i] + math(isAdd, num1, num2);
+    mathStr[usableSpace - i] =
+        getDigit(mathStr[usableSpace - i]) + math(isAdd, num1, num2);
 
-    if (mathStr[usableSpace - i] >= 10) {
-      mathStr[usableSpace - i] = mathStr[usableSpace - i] % 10;
+    if (getDigit(mathStr[usableSpace - i]) >= 10) {
+      mathStr[usableSpace - i] = getDigit(mathStr[usableSpace - i]) % 10;
       mathStr[usableSpace - (i + 1)] = 1;
     }
   }
@@ -147,10 +147,6 @@ void isWhitespace(char *line) {
 void isNonNumeric(char *line) {
   for (int i = 0; line[i] != '\0'; ++i) {
 
-    if (i == 0 && line[0] == '-') {
-      continue;
-    }
-
     if (isdigit(line[i]) == 0) {
       fprintf(
           stderr,
@@ -175,12 +171,8 @@ int max(int num1, int num2) {
   return num1;
 }
 
-int getDigit(int isNeg, int digit) {
-  if (isNeg) {
-    return 0 - digit;
-  } else {
-    return digit;
-  }
+int getDigit(int digit) {
+  return digit - '0';
 }
 
 int math(int isAdd, int num1, int num2) {
