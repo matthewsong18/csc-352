@@ -1,5 +1,6 @@
 assg4/prob1/strmath
-assg4/prob1/tests/outputs
+assg4/prob1/tests/outputs/*
+!assg4/prob1/tests/outputs/.gitkeep
 **/.DS_Store
 
 # Prerequisites
