@@ -102,10 +102,6 @@ void performMath(char **stringList) {
     exit(1);
   }
 
-  for (int i = 0; i < mathStrLen - 1; ++i) {
-    mathStr[i] = 0;
-  }
-
   int usableSpace = mathStrLen - 1;
   mathStr[usableSpace] = '\0';
 
@@ -129,10 +125,16 @@ void performMath(char **stringList) {
     }
   }
 
-  for (int i = 0; mathStr[i] != '\0'; ++i) {
-    printf("%c", mathStr[i]);
+  int mathNum = 0;
+  for (int i = 0; i < mathStrLen - 1; ++i) {
+    mathNum *= 10;
+    mathNum += mathStr[i];
   }
+
+  printf("%d", mathNum);
+
   printf("\n");
+  fflush(stdout);
 }
 
 void isWhitespace(char *line) {
