@@ -131,7 +131,6 @@ void performMath(char **stringList) {
   int unset = 1;
   int negative = 0;
   for (int i = 0; i < mathStrLen; ++i) {
-    printf("%s", mathStr);
     
     // Setting positive or negative mode
     if (unset) {
@@ -175,7 +174,7 @@ void performMath(char **stringList) {
     if (leadingZero) {
       continue;
     }
-    printf("%c", mathStr[i]);
+    printf("%d", mathStr[i]);
   }
   printf("\n");
   fflush(stdout);
