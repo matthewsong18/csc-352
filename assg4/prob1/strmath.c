@@ -98,7 +98,7 @@ void isWhitespace(char *line) {
 void isNonNumeric(char *line) {
   for (int i = 0; line[i] != '\0'; ++i) {
 
-    if (i == 0 && strcmp(&line[0], "-") == 0) {
+    if (i == 0 && line[0] == '-') {
       continue;
     }
 
