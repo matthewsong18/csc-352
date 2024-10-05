@@ -1,7 +1,9 @@
 /*
  * File: strmath.c
  * Author: Matthew W Song
- * Purpose: do math
+ * Purpose: A program that does addition and subtraction math through strings to
+ * overcome the 64 bit limit integers have, allowing the program to handle
+ * arithmetic on large values normally not possible with integers.
  */
 
 #include <ctype.h>
@@ -33,6 +35,7 @@ int main(void) {
   size_t linecap = 0;
   int lineNum = 0;
 
+  // Populate stringList with the 3 input strings
   while (getline(&line, &linecap, stdin) != EOF) {
     stringList[lineNum] = malloc(strlen(line) + 1);
     if (stringList[lineNum] == NULL) {
@@ -64,6 +67,8 @@ int main(void) {
   exit(0);
 }
 
+// Runs validation checks on all the inputs to make sure they meet the
+// requirements
 void inputValidation(int lineNum, char **stringList) {
 
   if (lineNum != 3) {
@@ -89,6 +94,7 @@ void inputValidation(int lineNum, char **stringList) {
   hasLeadingZero(stringList[2]);
 }
 
+// Performs addition or subtraction on the two digit strings
 void performMath(char **stringList) {
   int isAdd = strcmp(stringList[0], "add") == 0;
   char *string1 = stringList[1];
@@ -112,6 +118,7 @@ void performMath(char **stringList) {
     int num1 = 0;
     int num2 = 0;
 
+    // Iterate backwards to get the smallest numbers first
     if (lenStr1 >= i) {
       num1 = getDigit(string1[lenStr1 - i]);
     }
@@ -119,15 +126,21 @@ void performMath(char **stringList) {
       num2 = getDigit(string2[lenStr2 - i]);
     }
 
+    // Add result of performed math to the total result
     mathStr[usableSpace - i] =
         mathStr[usableSpace - i] + math(isAdd, num1, num2);
 
+    // Move carryon digits up the total result if found
     if (mathStr[usableSpace - i] >= 10) {
       mathStr[usableSpace - i] = mathStr[usableSpace - i] % 10;
       mathStr[usableSpace - (i + 1)] = 1;
     }
   }
 
+  /*
+   * The first digit from the left determines that the overall result is positive or negative. Since negative or positive numbers can be inside an opposite overall
+   * result, this loop finds them, then pulls higher digit numbers down to swap the sign until all digits are either positive or negative.
+   */
   int unset = 1;
   int negative = 0;
   for (int i = 0; i < mathStrLen; ++i) {
@@ -150,6 +163,7 @@ void performMath(char **stringList) {
     }
 
     if (negative) {
+      // Swap positive found in overall negative
       if (mathStr[i] > 0) {
         mathStr[i - 1] += 1;
         mathStr[i] = -10 + mathStr[i];
@@ -159,6 +173,7 @@ void performMath(char **stringList) {
     }
     // positive mode
     else {
+      // Swap negative found in overall positive
       if (mathStr[i] < 0) {
         mathStr[i - 1] -= 1;
         mathStr[i] = 10 + mathStr[i];
@@ -168,6 +183,7 @@ void performMath(char **stringList) {
     }
   }
 
+  // Printing the result while ignoring the leading zeros
   int leadingZero = 1;
   int leadingNeg = 1;
   for (int i = 0; i < mathStrLen; ++i) {
@@ -176,6 +192,7 @@ void performMath(char **stringList) {
     if (leadingZero) {
       continue;
     }
+    // If the overall result is negative, swap all the negative signs after the first digit to positive
     if (negative && !leadingNeg) {
       printf("%d", mathStr[i] * -1);
     } else {
