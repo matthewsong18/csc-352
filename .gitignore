@@ -1,8 +1,6 @@
 assg4/prob1/strmath
-myOut
-myErr
-exOut
-exErr
+assg4/prob1/tests/outputs
+**/.DS_Store
 
 # Prerequisites
 *.d
