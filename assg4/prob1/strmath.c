@@ -82,7 +82,7 @@ void inputValidation(int lineNum, char **stringList) {
   int notSub = strcmp(firstString, "sub") != 0;
 
   if (notAdd && notSub) {
-    fprintf(stderr, "1st line not equal to 'add' or 'sub'\n");
+    fprintf(stderr, "Error: 1st line not equal to 'add' or 'sub'\n");
     exit(1);
   }
 
