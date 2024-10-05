@@ -95,11 +95,15 @@ void performMath(char **stringList) {
   unsigned long lenStr2 = strlen(string2);
 
   int mathStrLen = max(lenStr1, lenStr2) + 2;
-  char *mathStr = calloc(mathStrLen, sizeof(char *));
+  char *mathStr = calloc(mathStrLen, sizeof(int));
 
   if (mathStr == NULL) {
     fprintf(stderr, "Out of memory\n");
     exit(1);
+  }
+
+  for (int i = 0; i < mathStrLen - 1; ++i) {
+    mathStr[i] = 0;
   }
 
   int usableSpace = mathStrLen - 1;
@@ -117,15 +121,18 @@ void performMath(char **stringList) {
     }
 
     mathStr[usableSpace - i] =
-        getDigit(mathStr[usableSpace - i]) + math(isAdd, num1, num2);
+        mathStr[usableSpace - i] + math(isAdd, num1, num2);
 
-    if (getDigit(mathStr[usableSpace - i]) >= 10) {
-      mathStr[usableSpace - i] = getDigit(mathStr[usableSpace - i]) % 10;
+    if (mathStr[usableSpace - i] >= 10) {
+      mathStr[usableSpace - i] = mathStr[usableSpace - i] % 10;
       mathStr[usableSpace - (i + 1)] = 1;
     }
   }
 
-  printf("%s", mathStr);
+  for (int i = 0; mathStr[i] != '\0'; ++i) {
+    printf("%c", mathStr[i]);
+  }
+  printf("\n");
 }
 
 void isWhitespace(char *line) {
@@ -171,9 +178,7 @@ int max(int num1, int num2) {
   return num1;
 }
 
-int getDigit(int digit) {
-  return digit - '0';
-}
+int getDigit(int digit) { return digit - '0'; }
 
 int math(int isAdd, int num1, int num2) {
   if (isAdd) {
