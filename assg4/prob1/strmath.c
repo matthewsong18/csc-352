@@ -82,7 +82,7 @@ void inputValidation(int lineNum, char **stringList) {
   int notSub = strcmp(firstString, "sub") != 0;
 
   if (notAdd && notSub) {
-    fprintf(stderr, "First string is not one of \"add\" or \"sub\".\n");
+    fprintf(stderr, "1st line not equal to 'add' or 'sub'\n");
     exit(1);
   }
 
@@ -210,13 +210,13 @@ void isWhitespace(char *line) {
   int isEmpty = strlen(line) == 0;
 
   if (isEmpty) {
-    fprintf(stderr, "A line contains only whitespace.\n");
+    fprintf(stderr, "Error: Non-integer characters in input\n");
     exit(1);
   }
 
   for (int i = 0; line[i] != '\0'; ++i) {
     if (isspace(line[i])) {
-      fprintf(stderr, "A line contains only whitespace.\n");
+      fprintf(stderr, "Error: Non-integer characters in input\n");
       exit(1);
     }
   }
