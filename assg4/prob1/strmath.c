@@ -131,7 +131,7 @@ void performMath(char **stringList) {
   int unset = 1;
   int negative = 0;
   for (int i = 0; i < mathStrLen; ++i) {
-    
+
     // Setting positive or negative mode
     if (unset) {
       if (mathStr[i] == 0)
@@ -169,12 +169,19 @@ void performMath(char **stringList) {
   }
 
   int leadingZero = 1;
+  int leadingNeg = 1;
   for (int i = 0; i < mathStrLen; ++i) {
-    if (mathStr[i] != 0) leadingZero = 0;
+    if (mathStr[i] != 0)
+      leadingZero = 0;
     if (leadingZero) {
       continue;
     }
-    printf("%d", mathStr[i]);
+    if (negative && !leadingNeg) {
+      printf("%d", mathStr[i] * -1);
+    } else {
+      printf("%d", mathStr[i]);
+      leadingNeg = 0;
+    }
   }
   printf("\n");
   fflush(stdout);
