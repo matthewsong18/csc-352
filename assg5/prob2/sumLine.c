@@ -2,6 +2,8 @@
 #include <stdlib.h>
 
 int main(void) {
+  int errorStatus = 0;
+
   char *line = NULL;
   size_t linecap = 0;
   ssize_t linelen;
@@ -17,20 +19,26 @@ int main(void) {
     int shiftAmount;
     while ((retval = sscanf(&line[lineShift], "%d %n", &number, &shiftAmount)) >
            0) {
+
+      if (number < 0) {
+        errorStatus = 1;
+        break;
+      }
+
       sum += number;
       lineShift += shiftAmount;
     }
 
     if (retval != -1) {
-      fprintf(stderr, "Error: Non-integer characters in input\n");
-      exit(1);
+      fprintf(stderr, "Bad line input\n");
+      errorStatus = 1;
+    } else {
+      // Get sum of line
+      printf("%d\n", sum);
     }
-
-    // Get sum of line
-    printf("%d\n", sum);
   }
 
   fflush(stdout);
 
-  exit(0);
+  return errorStatus;
 }
