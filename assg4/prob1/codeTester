@@ -14,7 +14,7 @@ for test_file in tests/test*.in; do
     
 	# 2: To myOut
 
-  echo $? >> tests/outputs/"$test_name"Out
+  echo $? >> tests/outputs/"$test_name"MyOut
     
 	# 3: Run program
     
