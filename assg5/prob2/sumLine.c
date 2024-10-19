@@ -31,6 +31,7 @@ int main(void) {
       }
     }
 
+    // Skip line if bad input
     if (skipLine) {
       fprintf(stderr, "Bad line input\n");
       skipLine = 0;
@@ -47,22 +48,12 @@ int main(void) {
     while ((retval = sscanf(&line[lineShift], "%d%n", &number, &shiftAmount)) >
            0) {
 
-      if (number < 0) {
-        errorStatus = 1;
-        break;
-      }
-
       sum += number;
       lineShift += shiftAmount;
     }
 
-    if (retval != -1) {
-      fprintf(stderr, "Bad line input\n");
-      errorStatus = 1;
-    } else {
-      // Get sum of line
-      printf("%d\n", sum);
-    }
+    // Get sum of line
+    printf("%d\n", sum);
   }
 
   fflush(stdout);
