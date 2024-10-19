@@ -1,3 +1,12 @@
+/*
+ * File: sumLine.c
+ * Author: Matthew W Song
+ * Purpose: A program that gathers a number of integers that are positive and
+ * add them together into a sum for each line. Characters that are not white
+ * space or a number are not allowed.
+ */
+
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -8,8 +17,26 @@ int main(void) {
   size_t linecap = 0;
   ssize_t linelen;
 
+  int skipLine = 0;
+
   // Read in line
   while ((linelen = getline(&line, &linecap, stdin)) > 0) {
+
+    // Validate that the line contains only digits and spaces
+    for (int i = 0; i < linelen && line[i] != '\n'; ++i) {
+      if (!isdigit(line[i]) && !isspace(line[i])) {
+        errorStatus = 1;
+        skipLine = 1;
+        break;
+      }
+    }
+
+    if (skipLine) {
+      fprintf(stderr, "Bad line input\n");
+      skipLine = 0;
+      continue;
+    }
+
     int retval;
     int number;
     int sum = 0;
@@ -17,7 +44,7 @@ int main(void) {
     // Parse line for numbers
     int lineShift = 0;
     int shiftAmount;
-    while ((retval = sscanf(&line[lineShift], "%d %n", &number, &shiftAmount)) >
+    while ((retval = sscanf(&line[lineShift], "%d%n", &number, &shiftAmount)) >
            0) {
 
       if (number < 0) {
