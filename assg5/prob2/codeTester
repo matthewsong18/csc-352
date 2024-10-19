@@ -2,7 +2,7 @@
 
 for test_file in tests/test*; do
 
-	test_name="${test_name#tests/}"
+	test_name="${test_file#tests/}"
 
 	echo "$test_name"
 	
