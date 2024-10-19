@@ -1,5 +1,5 @@
 count2 : count2.c
-	gcc -Wall count2.c -o count2
+	gcc -Wall -g  count2.c -o count2
 
 clean:
 	rm -f count2
