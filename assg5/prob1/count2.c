@@ -4,7 +4,6 @@
 typedef struct LinkedList {
   int number;
   int count;
-  struct LinkedList *prev;
   struct LinkedList *next;
 } LinkedList;
 
@@ -19,15 +18,8 @@ LinkedList *newList(int number) {
   newList->number = number;
   newList->count = 1;
   newList->next = NULL;
-  newList->prev = NULL;
 
   return newList;
-}
-
-LinkedList *newListPrev(int number, LinkedList *prev) {
-  LinkedList *list = newList(number);
-  list->prev = prev;
-  return list;
 }
 
 int main(void) {
@@ -61,7 +53,7 @@ int main(void) {
       }
 
       else if (current_ptr->next == NULL) {
-        current_ptr->next = newListPrev(numberBuffer, current_ptr);
+        current_ptr->next = newList(numberBuffer);
         break;
       }
 
@@ -104,25 +96,12 @@ int main(void) {
       continue;
     }
 
-    LinkedList *holderNext = current_ptr->next;
-    LinkedList *holderPrev = current_ptr->prev;
-
-    if (min->prev)
-      min->prev->next = current_ptr;
-    if (min->next)
-      min->next->prev = current_ptr;
-
-    current_ptr->prev = min->prev;
-    current_ptr->next = min->next;
-
-    if (head == current_ptr)
-      head = min;
-    current_ptr = min;
-
-    if (holderPrev)
-      current_ptr->prev = holderPrev;
-    if (holderNext)
-      current_ptr->next = holderNext;
+    int holdNumber = current_ptr->number;
+    int holdCount = current_ptr->count;
+    current_ptr->number = temp->number;
+    current_ptr->count = temp->count;
+    temp->number = holdNumber;
+    temp->count = holdCount;
 
     current_ptr = current_ptr->next;
   }
