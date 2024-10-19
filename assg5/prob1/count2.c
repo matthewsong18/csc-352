@@ -96,14 +96,12 @@ int main(void) {
       continue;
     }
 
-    if (!temp) {
-      int holdNumber = current_ptr->number;
-      int holdCount = current_ptr->count;
-      current_ptr->number = temp->number;
-      current_ptr->count = temp->count;
-      temp->number = holdNumber;
-      temp->count = holdCount;
-    }
+    int holdNumber = current_ptr->number;
+    int holdCount = current_ptr->count;
+    current_ptr->number = min->number;
+    current_ptr->count = min->count;
+    min->number = holdNumber;
+    min->count = holdCount;
 
     current_ptr = current_ptr->next;
   }
