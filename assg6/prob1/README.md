@@ -13,6 +13,12 @@ Strings are on multiple lines with whitespace between them
 - Make sure buffer protects for 64 length strings
 - Must be an alphabetic characters
 
+## Error handling
+
+- Do not crash
+- Print error message on invalid inputs and skip to next string
+- Error status should be 1 if an error was seen
+
 ## Requirements
 
 - No giant arrays
