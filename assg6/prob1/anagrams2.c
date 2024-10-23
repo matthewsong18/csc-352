@@ -227,7 +227,7 @@ int read_single_input(char **outputString) {
   // Grab one `string` from the input stream.
   int readStatus;
 
-  readStatus = scanf("64%s", *outputString);
+  readStatus = scanf("%64s", *outputString);
 
   // alphabetic character strings only
   if (readStatus == EOF)
