@@ -54,8 +54,6 @@ int main(void) {
 
   free_anagram_list(head);
 
-  fflush(stdout);
-
   return errorStatus;
 }
 
@@ -87,13 +85,7 @@ Node *build_linked_list(int *errorStatus) {
       NULL; // The head pointer used to get to the head of the linked list
   Node *current = NULL; // The pointer used to keep track of the current node
 
-  while ((readStatus = read_single_input(&buffer)) > 0) {
-
-    // Check status
-    if (readStatus == -1)
-      break;
-    if (readStatus == 1)
-      *errorStatus = 1;
+  while ((readStatus = read_single_input(&buffer)) == 0) {
 
     // Change to lowercase
     to_lowercase(buffer);
@@ -153,6 +145,9 @@ Node *build_linked_list(int *errorStatus) {
     // the tail of the `anagram` linked list.
     append_node(head, create_node(buffer));
   }
+  // Check status
+  if (readStatus == 1)
+    *errorStatus = 1;
 
   return head;
 }
@@ -176,6 +171,7 @@ void print_anagram_list(Node *head) {
     printf("%s", head->anagram);
     print_match_list(head->string_match);
     printf("\n");
+    fflush(stdout);
     head = head->next;
   }
 }
