@@ -352,7 +352,7 @@ void append_node(Node *head, Node *newNode) {
  */
 void print_match_list(Node *head) {
   while (head) {
-    printf("%s", head->anagram);
+    printf(" %s", head->anagram);
     head = head->next;
   }
 }
