@@ -125,7 +125,7 @@ Node *build_linked_list(int *errorStatus) {
       // Checking for duplicates
       while (current_match) {
 
-        if (strcmp(current_match->anagram, buffer)) {
+        if (strcmp(current_match->anagram, buffer) == 0) {
           duplicate = 1;
           break;
         }
