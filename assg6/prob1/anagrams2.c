@@ -136,6 +136,7 @@ Node *build_linked_list(int *errorStatus) {
       // No duplicate found so create a new node for the `string` at the tail of
       // the `string_match` linked list.
       append_node(current->string_match, create_node(buffer));
+      break;
     }
 
     if (duplicate)
@@ -144,6 +145,7 @@ Node *build_linked_list(int *errorStatus) {
     // If there is no anagram matching the `string`, add a new anagram node at
     // the tail of the `anagram` linked list.
     append_node(head, create_node(buffer));
+    break;
   }
   // Check status
   if (readStatus == 1)
