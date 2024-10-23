@@ -101,6 +101,7 @@ Node *build_linked_list(int *errorStatus) {
     // Check if the `string` matches an anagram in the `anagram` linked list.
     current = head;
     int duplicate = 0;
+    int match = 0;
 
     while (current) {
 
@@ -114,6 +115,8 @@ Node *build_linked_list(int *errorStatus) {
         current = current->next;
         continue;
       }
+
+      match = 1;
 
       // String matches anagram so check if string already exists in the linked
       // list
@@ -146,6 +149,9 @@ Node *build_linked_list(int *errorStatus) {
     }
 
     if (duplicate)
+      continue;
+
+    if (match)
       continue;
 
     // If there is no anagram matching the `string`, add a new anagram node at
