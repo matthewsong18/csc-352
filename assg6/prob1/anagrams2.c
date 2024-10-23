@@ -54,6 +54,8 @@ int main(void) {
 
   free_anagram_list(head);
 
+  fflush(stdout);
+
   return errorStatus;
 }
 
@@ -72,11 +74,18 @@ Node *build_linked_list(int *errorStatus) {
   // hits EOF
   char *buffer =
       malloc(65 * sizeof(char)); // Used as a buffer for read_single_input
+
+  if (buffer == NULL) {
+    fprintf(stderr, "Error: Out of memory");
+    exit(1);
+  }
+
   int readStatus;
 
   int firstRead = 1; // Tracks if the first read so head get's initialzied
-  Node *head;    // The head pointer used to get to the head of the linked list
-  Node *current; // The pointer used to keep track of the current node
+  Node *head =
+      NULL; // The head pointer used to get to the head of the linked list
+  Node *current = NULL; // The pointer used to keep track of the current node
 
   while ((readStatus = read_single_input(&buffer)) > 0) {
 
@@ -93,33 +102,48 @@ Node *build_linked_list(int *errorStatus) {
     if (firstRead) {
       head = create_node(buffer);
       current = head;
+      firstRead = 0;
       continue;
     }
 
     // Check if the `string` matches an anagram in the `anagram` linked list.
+    current = head;
     int duplicate = 0;
 
     while (current) {
 
+      if (strcmp(current->anagram, buffer) == 0) {
+        duplicate = 1;
+        break;
+      }
+
+      // Skip to next anagram if no match
+      if (!is_match(current->anagram, buffer)) {
+        current = current->next;
+        continue;
+      }
+
+      // String matches anagram so check if string already exists in the linked
+      // list
       Node *current_match = current->string_match;
 
       // Checking for duplicates
       while (current_match) {
 
-        if (current_match->anagram == buffer) {
+        if (strcmp(current_match->anagram, buffer)) {
           duplicate = 1;
           break;
         }
+
+        current_match = current_match->next;
       }
 
       if (duplicate)
         break;
 
-      // If it matches, create a new node for the `string` at the tail of the
-      // `string_match` linked list.
-      if (is_match(current->anagram, buffer)) {
-        append_node(current->string_match, create_node(buffer));
-      }
+      // No duplicate found so create a new node for the `string` at the tail of
+      // the `string_match` linked list.
+      append_node(current->string_match, create_node(buffer));
     }
 
     if (duplicate)
@@ -197,10 +221,7 @@ int read_single_input(char **outputString) {
   readStatus = scanf("%s", *outputString);
 
   // alphabetic character strings only
-  if (readStatus == -1)
-    return -1;
-
-  if (readStatus == 0)
+  if (readStatus == EOF)
     return -1;
 
   if (!isalpha(**outputString))
@@ -235,7 +256,13 @@ Node *create_node(char *anagram) {
     exit(1);
   }
 
-  new_node->anagram = anagram;
+  new_node->anagram = strdup(anagram); // Create a new copy of the string
+
+  if (new_node->anagram == NULL) {
+    fprintf(stderr, "Error: Out of memory for string");
+    exit(1);
+  }
+
   new_node->string_match = NULL;
   new_node->next = NULL;
 
@@ -266,6 +293,21 @@ int is_match(char *anagram, char *string) {
   string_head = selection_sort(string_head);
 
   // Compare Count Linked Lists
+  CountNode *temp1 = anagram_head;
+  CountNode *temp2 = string_head;
+
+  while (temp1 && temp2) {
+    if (temp1->letter != temp2->letter || temp1->count != temp2->count) {
+      return 0; // If any letter count differs, it's not a match
+    }
+    temp1 = temp1->next;
+    temp2 = temp2->next;
+  }
+
+  if (temp1 != NULL || temp2 != NULL) {
+    return 0; // If one list is longer than the other, it's not a match
+  }
+
   return 1;
 }
 
