@@ -1,7 +1,9 @@
 // TODO: Doc
 
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef struct Node {
   // pointer reserved for allocating space for anagram with malloc
@@ -10,21 +12,37 @@ typedef struct Node {
   struct Node *next;
 } Node;
 
+typedef struct CountNode {
+  char letter;
+  int count;
+  struct CountNode *next;
+} CountNode;
+
 Node *build_linked_list(int *errorStatus);
 
 void print_anagram_list(Node *head);
 
 void free_anagram_list(Node *head);
 
-int read_single_input(char **outputString);
+int read_single_input(char *outputString);
+
+void to_lowercase(char *buffer);
 
 Node *create_node(char *anagram);
+
+int is_match(char *anagram, char *string);
 
 Node *append_node(Node *head, Node *newNode);
 
 void print_match_list(Node *head);
 
 void free_match_list(Node *head);
+
+CountNode *create_count_node(char letter);
+
+CountNode *count_letters(char *string);
+
+CountNode *selection_sort(CountNode *head);
 
 // TODO: Doc
 int main(void) {
@@ -52,24 +70,66 @@ int main(void) {
 Node *build_linked_list(int *errorStatus) {
   // Loop through the input stream one string at a time until the input stream
   // hits EOF
-  char **buffer;
+  char *buffer[65]; // Used as a buffer for read_single_input
   int readStatus;
 
-  while ((readStatus = read_single_input(buffer)) > 0) {
-    // TODO: Do stuff
+  int firstRead = 1; // Tracks if the first read so head get's initialzied
+  Node *head;    // The head pointer used to get to the head of the linked list
+  Node *current; // The pointer used to keep track of the current node
+
+  while ((readStatus = read_single_input(*buffer)) > 0) {
 
     // Check status
+    if (readStatus == -1)
+      break;
+    if (readStatus == 1)
+      *errorStatus = 1;
+
+    // Change to lowercase
+    to_lowercase(*buffer);
+
+    // Check if first read
+    if (firstRead) {
+      head = create_node(*buffer);
+      current = head;
+      continue;
+    }
 
     // Check if the `string` matches an anagram in the `anagram` linked list.
+    int duplicate = 0;
 
-    // If it matches, create a new node for the `string` at the tail of the
-    // `string_match` linked list.
+    while (current) {
+
+      Node *current_match = current->string_match;
+
+      // Checking for duplicates
+      while (current_match) {
+
+        if (current_match->anagram == *buffer) {
+          duplicate = 1;
+          break;
+        }
+      }
+
+      if (duplicate)
+        break;
+
+      // If it matches, create a new node for the `string` at the tail of the
+      // `string_match` linked list.
+      if (is_match(current->anagram, *buffer)) {
+        append_node(current->string_match, create_node(*buffer));
+      }
+    }
+
+    if (duplicate)
+      continue;
 
     // If there is no anagram matching the `string`, add a new anagram node at
     // the tail of the `anagram` linked list.
+    append_node(head, create_node(*buffer));
   }
 
-  return NULL;
+  return head;
 }
 
 /**
@@ -87,20 +147,12 @@ Node *build_linked_list(int *errorStatus) {
  * @return No return value
  */
 void print_anagram_list(Node *head) {
-  // TODO
-}
-
-/**
- * Function: print_match_list
- *
- * Prints the matching strings for an anagram.
- *
- * @param head The head pointer for the matching strings linked list
- *
- * @return No return value
- */
-void print_match_list(Node *head) {
-  // TODO
+  while (head) {
+    printf("%s", head->anagram);
+    print_match_list(head->string_match);
+    printf("\n");
+    head = head->next;
+  }
 }
 
 /**
@@ -129,21 +181,37 @@ void free_anagram_list(Node *head) {
 }
 
 /**
- * Function: free_match_list
+ * Function: read_single_input
  *
- * Frees up the matching string linked list recursively.
+ * Reads in a single string from the stdin input stream.
  *
- * @param head The head pointer for the anagram linked list
+ * @param outputString The location where the read string will be saved
  *
- * @return No return value
+ * @return Returns 0 for success, 1 for error, and -1 for EOF
  */
-void free_match_list(Node *head) {
-  // Base case
-  if (head == NULL)
-    return;
+int read_single_input(char *outputString) {
+  // Grab one `string` from the input stream.
+  int readStatus;
 
-  free_match_list(head->next);
-  free(head);
+  readStatus = scanf("%s", outputString);
+
+  // alphabetic character strings only
+  if (readStatus == -1)
+    return -1;
+
+  if (!isalpha(*outputString))
+    return 1;
+
+  return 0;
+}
+
+/**
+ * TODO
+ */
+void to_lowercase(char *buffer) {
+  for (int i = 0; i < strlen(buffer); ++i) {
+    buffer[i] = tolower(buffer[i]);
+  }
 }
 
 /**
@@ -156,39 +224,45 @@ void free_match_list(Node *head) {
  * @return The pointer towards the new node
  */
 Node *create_node(char *anagram) {
-  Node *newNode = malloc(sizeof(Node));
+  Node *new_node = malloc(sizeof(Node));
 
-  if (newNode == NULL) {
+  if (new_node == NULL) {
     fprintf(stderr, "Error: Out of memory");
     exit(1);
   }
 
-  newNode->anagram = anagram;
-  newNode->string_match = NULL;
-  newNode->next = NULL;
+  new_node->anagram = anagram;
+  new_node->string_match = NULL;
+  new_node->next = NULL;
 
-  return newNode;
+  return new_node;
 }
 
 /**
- * Function: read_single_input
+ * Function: is_match
  *
- * Reads in a single string from the stdin input stream.
+ * Compares anagram and string to see if string matches to the anagram
  *
- * @param outputString The location where the read string will be saved
+ * @param anagram The anagram being compared against
  *
- * @return Returns 1 for an error and 0 for success
+ * @param string The string trying to be matched to the anagram
+ *
+ * @return Returns 1 string matches the anagram. 0 if there's no match.
  */
-int read_single_input(char **outputString) {
-  // TODO
-  // Grab one `string` from the input stream.
+int is_match(char *anagram, char *string) {
+  if (strlen(anagram) != strlen(string))
+    return 0;
 
-  // 64 length string buffer
-  // alphabetic character strings only
+  // Count letters
+  CountNode *anagram_head = count_letters(anagram);
+  CountNode *string_head = count_letters(string);
 
-  // Save string in outputString
+  // Sort Linked Lists
+  anagram_head = selection_sort(anagram_head);
+  string_head = selection_sort(string_head);
 
-  return 0;
+  // Compare Count Linked Lists
+  return 1;
 }
 
 /**
@@ -210,6 +284,130 @@ Node *append_node(Node *head, Node *newNode) {
   }
 
   temp_ptr->next = newNode;
+
+  return head;
+}
+
+/**
+ * Function: print_match_list
+ *
+ * Prints the matching strings for an anagram.
+ *
+ * @param head The head pointer for the matching strings linked list
+ *
+ * @return No return value
+ */
+void print_match_list(Node *head) {
+  while (head) {
+    printf("%s", head->anagram);
+    head = head->next;
+  }
+}
+
+/**
+ * Function: free_match_list
+ *
+ * Frees up the matching string linked list recursively.
+ *
+ * @param head The head pointer for the anagram linked list
+ *
+ * @return No return value
+ */
+void free_match_list(Node *head) {
+  // Base case
+  if (head == NULL)
+    return;
+
+  free_match_list(head->next);
+  free(head);
+}
+
+/**
+ * TODO
+ */
+CountNode *create_count_node(char letter) {
+  CountNode *new_count_node = malloc(sizeof(CountNode));
+
+  if (new_count_node == NULL) {
+    fprintf(stderr, "Error: Out of memory");
+    exit(1);
+  }
+
+  new_count_node->letter = letter;
+  new_count_node->count = 1;
+  new_count_node->next = NULL;
+
+  return new_count_node;
+}
+
+/**
+ * TODO
+ */
+CountNode *count_letters(char *string) {
+  CountNode *head;
+  CountNode *current;
+
+  for (int i = 0; i < strlen(string); ++i) {
+
+    // Empty Linked List
+    if (i == 0) {
+      head = create_count_node(string[i]);
+      current = head;
+      continue;
+    }
+
+    // Update count or add letter count to linked list
+    while (current) {
+      if (current->letter == string[i]) {
+        current->count++;
+        break;
+      }
+
+      if (current->next == NULL) {
+        current->next = create_count_node(string[i]);
+        break;
+      }
+
+      current = current->next;
+    }
+  }
+
+  return head;
+}
+
+/**
+ * TODO
+ */
+CountNode *selection_sort(CountNode *head) {
+  CountNode *min;
+  CountNode *current = head;
+
+  while (current) {
+    min = current;
+    CountNode *temp = current;
+
+    // Find letter closest to a
+    while (temp) {
+      if (temp->letter < min->letter)
+        min = temp;
+      temp = temp->next;
+    }
+
+    if (min == current) {
+      current = current->next;
+      continue;
+    }
+
+    // Swap data
+    char hold_letter = current->letter;
+    int hold_count = current->count;
+    current->letter = min->letter;
+    current->count = min->count;
+    min->letter = hold_letter;
+    min->count = hold_count;
+
+    current = current->next;
+  }
 
   return head;
 }
