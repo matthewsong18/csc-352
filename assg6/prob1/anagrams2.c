@@ -32,7 +32,7 @@ Node *create_node(char *anagram);
 
 int is_match(char *anagram, char *string);
 
-Node *append_node(Node *head, Node *newNode);
+void append_node(Node *head, Node *newNode);
 
 void print_match_list(Node *head);
 
@@ -318,16 +318,19 @@ int is_match(char *anagram, char *string) {
  *
  * @return Returns the head pointer
  */
-Node *append_node(Node *head, Node *newNode) {
+void append_node(Node *head, Node *newNode) {
   Node *temp_ptr = head;
+
+  if (head == NULL) {
+    head = newNode;
+    return;
+  }
 
   while (temp_ptr->next != NULL) {
     temp_ptr = temp_ptr->next;
   }
 
   temp_ptr->next = newNode;
-
-  return head;
 }
 
 /**
