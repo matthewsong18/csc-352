@@ -70,7 +70,7 @@ int main(void) {
 Node *build_linked_list(int *errorStatus) {
   // Loop through the input stream one string at a time until the input stream
   // hits EOF
-  char **buffer =
+  char *buffer =
       malloc(65 * sizeof(char)); // Used as a buffer for read_single_input
   int readStatus;
 
@@ -78,7 +78,7 @@ Node *build_linked_list(int *errorStatus) {
   Node *head;    // The head pointer used to get to the head of the linked list
   Node *current; // The pointer used to keep track of the current node
 
-  while ((readStatus = read_single_input(*buffer)) > 0) {
+  while ((readStatus = read_single_input(buffer)) > 0) {
 
     // Check status
     if (readStatus == -1)
@@ -87,11 +87,11 @@ Node *build_linked_list(int *errorStatus) {
       *errorStatus = 1;
 
     // Change to lowercase
-    to_lowercase(*buffer);
+    to_lowercase(buffer);
 
     // Check if first read
     if (firstRead) {
-      head = create_node(*buffer);
+      head = create_node(buffer);
       current = head;
       continue;
     }
@@ -106,7 +106,7 @@ Node *build_linked_list(int *errorStatus) {
       // Checking for duplicates
       while (current_match) {
 
-        if (current_match->anagram == *buffer) {
+        if (current_match->anagram == buffer) {
           duplicate = 1;
           break;
         }
@@ -117,8 +117,8 @@ Node *build_linked_list(int *errorStatus) {
 
       // If it matches, create a new node for the `string` at the tail of the
       // `string_match` linked list.
-      if (is_match(current->anagram, *buffer)) {
-        append_node(current->string_match, create_node(*buffer));
+      if (is_match(current->anagram, buffer)) {
+        append_node(current->string_match, create_node(buffer));
       }
     }
 
@@ -127,7 +127,7 @@ Node *build_linked_list(int *errorStatus) {
 
     // If there is no anagram matching the `string`, add a new anagram node at
     // the tail of the `anagram` linked list.
-    append_node(head, create_node(*buffer));
+    append_node(head, create_node(buffer));
   }
 
   return head;
@@ -198,6 +198,9 @@ int read_single_input(char *outputString) {
 
   // alphabetic character strings only
   if (readStatus == -1)
+    return -1;
+
+  if (readStatus == 0)
     return -1;
 
   if (!isalpha(*outputString))
