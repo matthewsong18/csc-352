@@ -70,7 +70,8 @@ int main(void) {
 Node *build_linked_list(int *errorStatus) {
   // Loop through the input stream one string at a time until the input stream
   // hits EOF
-  char *buffer[65]; // Used as a buffer for read_single_input
+  char **buffer =
+      malloc(65 * sizeof(char)); // Used as a buffer for read_single_input
   int readStatus;
 
   int firstRead = 1; // Tracks if the first read so head get's initialzied
