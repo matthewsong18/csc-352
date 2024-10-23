@@ -139,8 +139,8 @@ Node *build_linked_list(int *errorStatus) {
       // No duplicate found so create a new node for the `string` at the tail of
       // the `string_match` linked list.
 
-      if (head->string_match == NULL) {
-        head->string_match = create_node(buffer);
+      if (current->string_match == NULL) {
+        current->string_match = create_node(buffer);
         break;
       }
 
