@@ -24,7 +24,7 @@ void print_anagram_list(Node *head);
 
 void free_anagram_list(Node *head);
 
-int read_single_input(char *outputString);
+int read_single_input(char **outputString);
 
 void to_lowercase(char *buffer);
 
@@ -78,7 +78,7 @@ Node *build_linked_list(int *errorStatus) {
   Node *head;    // The head pointer used to get to the head of the linked list
   Node *current; // The pointer used to keep track of the current node
 
-  while ((readStatus = read_single_input(buffer)) > 0) {
+  while ((readStatus = read_single_input(&buffer)) > 0) {
 
     // Check status
     if (readStatus == -1)
@@ -190,11 +190,11 @@ void free_anagram_list(Node *head) {
  *
  * @return Returns 0 for success, 1 for error, and -1 for EOF
  */
-int read_single_input(char *outputString) {
+int read_single_input(char **outputString) {
   // Grab one `string` from the input stream.
   int readStatus;
 
-  readStatus = scanf("%s", outputString);
+  readStatus = scanf("%s", *outputString);
 
   // alphabetic character strings only
   if (readStatus == -1)
@@ -203,7 +203,7 @@ int read_single_input(char *outputString) {
   if (readStatus == 0)
     return -1;
 
-  if (!isalpha(*outputString))
+  if (!isalpha(**outputString))
     return 1;
 
   return 0;
