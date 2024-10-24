@@ -18,15 +18,17 @@ typedef struct CountNode {
   struct CountNode *next;
 } CountNode;
 
+// Main functions
+
 Node *build_linked_list(int *errorStatus);
 
 void print_anagram_list(Node *head);
 
 void free_anagram_list(Node *head);
 
-int read_single_input(char **outputString);
+// Build linked list functions
 
-char *to_lowercase(char *buffer);
+int read_single_input(char **outputString);
 
 Node *create_node(char *anagram);
 
@@ -34,15 +36,27 @@ int is_match(char *anagram, char *string);
 
 void append_node(Node *head, Node *newNode);
 
+// Print anagram list function
+
 void print_match_list(Node *head);
+
+// Free anagram list function
 
 void free_match_list(Node *head);
 
-CountNode *create_count_node(char letter);
+// Is match functions
+
+char *to_lowercase(char *buffer);
 
 CountNode *count_letters(char *string);
 
 CountNode *selection_sort(CountNode *head);
+
+// Count letters function
+
+CountNode *create_count_node(char letter);
+
+void free_count_node(CountNode *head);
 
 // TODO: Doc
 int main(void) {
@@ -165,6 +179,8 @@ Node *build_linked_list(int *errorStatus) {
   if (readStatus == 1)
     *errorStatus = 1;
 
+  free(buffer);
+
   return head;
 }
 
@@ -243,27 +259,6 @@ int read_single_input(char **outputString) {
 }
 
 /**
- * TODO
- */
-char *to_lowercase(char *buffer) {
-  int len = strlen(buffer);
-  char *new_string = malloc((len + 1) * sizeof(char));
-
-  if (new_string == NULL) {
-    fprintf(stderr, "Error: Out of Memory");
-    exit(1);
-  }
-
-  for (int i = 0; i < len; ++i) {
-    new_string[i] = tolower(buffer[i]);
-  }
-
-  new_string[len] = '\0';
-
-  return new_string;
-}
-
-/**
  * Function: create_node
  *
  * Creates a new node, storing a string anagram
@@ -336,6 +331,9 @@ int is_match(char *anagram, char *string) {
     return 0; // If one list is longer than the other, it's not a match
   }
 
+  free_count_node(anagram_head);
+  free_count_node(string_head);
+
   return 1;
 }
 
@@ -397,19 +395,22 @@ void free_match_list(Node *head) {
 /**
  * TODO
  */
-CountNode *create_count_node(char letter) {
-  CountNode *new_count_node = malloc(sizeof(CountNode));
+char *to_lowercase(char *buffer) {
+  int len = strlen(buffer);
+  char *new_string = malloc((len + 1) * sizeof(char));
 
-  if (new_count_node == NULL) {
-    fprintf(stderr, "Error: Out of memory");
+  if (new_string == NULL) {
+    fprintf(stderr, "Error: Out of Memory");
     exit(1);
   }
 
-  new_count_node->letter = letter;
-  new_count_node->count = 1;
-  new_count_node->next = NULL;
+  for (int i = 0; i < len; ++i) {
+    new_string[i] = tolower(buffer[i]);
+  }
 
-  return new_count_node;
+  new_string[len] = '\0';
+
+  return new_string;
 }
 
 /**
@@ -439,6 +440,8 @@ CountNode *count_letters(char *string) {
         current->next = create_count_node(string[i]);
         break;
       }
+
+      free(string);
 
       current = current->next;
     }
@@ -482,4 +485,37 @@ CountNode *selection_sort(CountNode *head) {
   }
 
   return head;
+}
+
+/**
+ * TODO
+ */
+CountNode *create_count_node(char letter) {
+  CountNode *new_count_node = malloc(sizeof(CountNode));
+
+  if (new_count_node == NULL) {
+    fprintf(stderr, "Error: Out of memory");
+    exit(1);
+  }
+
+  new_count_node->letter = letter;
+  new_count_node->count = 1;
+  new_count_node->next = NULL;
+
+  return new_count_node;
+}
+
+/**
+ * TODO
+ */
+void free_count_node(CountNode *head) {
+
+  if (head == NULL)
+    return;
+
+  // Free next node
+  free_count_node(head->next);
+
+  // Free head
+  free(head);
 }
