@@ -103,6 +103,11 @@ Node *build_linked_list(int *errorStatus) {
     while (current) {
 
       if (strcmp(current->anagram, buffer) == 0) {
+        if (current->string_match == NULL) {
+          current->string_match = create_node(buffer);
+        } else {
+          append_node(current->string_match, create_node(buffer));
+        }
         duplicate = 1;
         break;
       }
