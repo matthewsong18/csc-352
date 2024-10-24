@@ -399,6 +399,7 @@ void free_match_list(Node *head) {
     return;
 
   free_match_list(head->next);
+  free(head->anagram);
   free(head);
 }
 
