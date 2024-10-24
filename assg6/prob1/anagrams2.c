@@ -321,6 +321,10 @@ int is_match(char *anagram, char *string) {
 
   while (temp1 && temp2) {
     if (temp1->letter != temp2->letter || temp1->count != temp2->count) {
+      free(anagram_lower);
+      free(string_lower);
+      free_count_node(anagram_head);
+      free_count_node(string_head);
       return 0; // If any letter count differs, it's not a match
     }
     temp1 = temp1->next;
@@ -328,9 +332,15 @@ int is_match(char *anagram, char *string) {
   }
 
   if (temp1 != NULL || temp2 != NULL) {
+    free(anagram_lower);
+    free(string_lower);
+    free_count_node(anagram_head);
+    free_count_node(string_head);
     return 0; // If one list is longer than the other, it's not a match
   }
 
+  free(anagram_lower);
+  free(string_lower);
   free_count_node(anagram_head);
   free_count_node(string_head);
 
@@ -441,7 +451,7 @@ CountNode *count_letters(char *string) {
         break;
       }
 
-      free(string);
+      // free(string);
 
       current = current->next;
     }
