@@ -1,4 +1,12 @@
-// TODO: Doc
+/*
+ * File: anagrams2.c
+ * Author: Matthew W Song
+ * Purpose: A program that collects strings and matches them in groups of
+ * anagrams, where each group of strings are anagrams of each other. Only
+ * alphabetic characters are allowed, but the program will not crash. It will
+ * only record that the error happend and print an error. Otherwise, the program
+ * still continues until EOF.
+ */
 
 #include <ctype.h>
 #include <stdio.h>
@@ -58,7 +66,7 @@ CountNode *create_count_node(char letter);
 
 void free_count_node(CountNode *head);
 
-// TODO: Doc
+// The starting point of the program
 int main(void) {
   int errorStatus = 0;
 
@@ -404,7 +412,13 @@ void free_match_list(Node *head) {
 }
 
 /**
- * TODO
+ * Function: to_lowercase
+ *
+ * Creates a new string that is the lowercase version of the buffer string input
+ *
+ * @param buffer The buffer string that is to be made lowercase
+ *
+ * @return Returns a new string that is buffer but lowercase
  */
 char *to_lowercase(char *buffer) {
   int len = strlen(buffer);
@@ -425,7 +439,13 @@ char *to_lowercase(char *buffer) {
 }
 
 /**
- * TODO
+ * Function: count_letters
+ *
+ * Counts the number of letters in the string and maps them in a linked list
+ *
+ * @param string The string whose letters are being counted
+ *
+ * @return Returns a linked list mapping each letter of the string to its count
  */
 CountNode *count_letters(char *string) {
   CountNode *head;
@@ -462,7 +482,13 @@ CountNode *count_letters(char *string) {
 }
 
 /**
- * TODO
+ * Function: selection_sort
+ *
+ * Sorts the linked list using the selection sort algorithm
+ *
+ * @param head The head pointer to the linked list being sorted
+ *
+ * @return Returns the sorted linked list's head pointer
  */
 CountNode *selection_sort(CountNode *head) {
   CountNode *min;
@@ -499,7 +525,13 @@ CountNode *selection_sort(CountNode *head) {
 }
 
 /**
- * TODO
+ * Function: create_count_node
+ *
+ * Creates a new node for the count linked list
+ *
+ * @param letter The letter being counted
+ *
+ * @return Returns a new node containing the letter with count 1
  */
 CountNode *create_count_node(char letter) {
   CountNode *new_count_node = malloc(sizeof(CountNode));
@@ -517,7 +549,11 @@ CountNode *create_count_node(char letter) {
 }
 
 /**
- * TODO
+ * Function: free_count_node
+ *
+ * Frees up the entire count linked list
+ *
+ * @param head The head pointer of the count linked list
  */
 void free_count_node(CountNode *head) {
 
