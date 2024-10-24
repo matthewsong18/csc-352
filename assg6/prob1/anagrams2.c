@@ -26,7 +26,7 @@ void free_anagram_list(Node *head);
 
 int read_single_input(char **outputString);
 
-void to_lowercase(char *buffer);
+char **to_lowercase(char *buffer);
 
 Node *create_node(char *anagram);
 
@@ -87,9 +87,6 @@ Node *build_linked_list(int *errorStatus) {
 
   while ((readStatus = read_single_input(&buffer)) == 0) {
 
-    // Change to lowercase
-    to_lowercase(buffer);
-
     // Check if first read
     if (firstRead) {
       head = create_node(buffer);
@@ -126,6 +123,7 @@ Node *build_linked_list(int *errorStatus) {
       while (current_match) {
 
         if (strcmp(current_match->anagram, buffer) == 0) {
+          append_node(current_match, create_node(buffer));
           duplicate = 1;
           break;
         }
@@ -242,10 +240,19 @@ int read_single_input(char **outputString) {
 /**
  * TODO
  */
-void to_lowercase(char *buffer) {
-  for (int i = 0; i < strlen(buffer); ++i) {
-    buffer[i] = tolower(buffer[i]);
+char **to_lowercase(char *buffer) {
+  char **new_string = malloc(strlen(buffer) * sizeof(char));
+
+  if (new_string == NULL) {
+    fprintf(stderr, "Error: Out of Memory");
+    exit(1);
   }
+
+  for (int i = 0; i < strlen(buffer); ++i) {
+    *new_string[i] = (char)tolower(buffer[i]);
+  }
+
+  return new_string;
 }
 
 /**
@@ -293,9 +300,13 @@ int is_match(char *anagram, char *string) {
   if (strlen(anagram) != strlen(string))
     return 0;
 
+  // Make lowercase
+  char **anagram_lower = to_lowercase(anagram);
+  char **string_lower = to_lowercase(string);
+
   // Count letters
-  CountNode *anagram_head = count_letters(anagram);
-  CountNode *string_head = count_letters(string);
+  CountNode *anagram_head = count_letters(*anagram_lower);
+  CountNode *string_head = count_letters(*string_lower);
 
   // Sort Linked Lists
   anagram_head = selection_sort(anagram_head);
