@@ -23,7 +23,7 @@ for test_file in tests/test*; do
 
   # 5: Print test results
   printf "Test File $test_name\n"
-  printf "stdout diffs: $(diff tests/outputs/"$test_name"ExOut tests/outputs/"$test_name"MyOut)\n"
-  printf "stderr diffs: $(diff tests/outputs/"$test_name"ExErr tests/outputs/"$test_name"MyErr)\n"
+  printf "stdout diffs: $(diff -Z tests/outputs/"$test_name"ExOut tests/outputs/"$test_name"MyOut)\n"
+  printf "stderr diffs: $(diff -Z tests/outputs/"$test_name"ExErr tests/outputs/"$test_name"MyErr)\n"
   printf "\n"
 done
