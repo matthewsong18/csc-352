@@ -75,6 +75,7 @@ int main(int argc, char *argv[]) {
   int pathExists = 0;
 
   while (strlen(inputLine = getInput(inputFile)) > 0) {
+
     command = malloc(4 * sizeof(char));
     arg1 = malloc(65 * sizeof(char));
     arg2 = malloc(65 * sizeof(char));
@@ -199,7 +200,7 @@ char *getInput(FILE *inputFile) {
   if (inputFile != NULL) {
 
     // Use inputFile if it exists
-    success = getline(&line, &linecap, inputFile);
+    getline(&line, &linecap, inputFile);
   } else {
 
     // Use stdin if inputFile does not exist
@@ -212,7 +213,10 @@ char *getInput(FILE *inputFile) {
     exit(1);
   }
 
-  return line;
+  char *retval = strdup(line);
+  free(line);
+
+  return retval;
 }
 
 /**
