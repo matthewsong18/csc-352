@@ -157,6 +157,8 @@ int main(int argc, char *argv[]) {
 
   freeGraph(head_ptr);
 
+  free(inputLine);
+
   return errorStatus;
 }
 
