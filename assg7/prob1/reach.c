@@ -76,6 +76,10 @@ int main(int argc, char *argv[]) {
 
   while (strlen(inputLine = getInput(inputFile)) > 0) {
 
+    if (inputLine == 0) {
+      continue;
+    }
+
     command = malloc(4 * sizeof(char));
     arg1 = malloc(65 * sizeof(char));
     arg2 = malloc(65 * sizeof(char));
@@ -207,16 +211,18 @@ char *getInput(FILE *inputFile) {
     success = getline(&line, &linecap, stdin);
   }
 
+  if (success == -1) {
+    free(line);
+    return 0;
+  }
+
   if (line == NULL) {
     handleError(ERROR_MALLOC);
     free(line);
     exit(1);
   }
 
-  char *retval = strdup(line);
-  free(line);
-
-  return retval;
+  return line;
 }
 
 /**
