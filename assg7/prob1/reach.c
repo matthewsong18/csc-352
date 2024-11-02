@@ -112,11 +112,11 @@ int main(int argc, char *argv[]) {
              pathExists); // pathExists = 1 if there is such a path, 0 otherwise
       break;
     }
-
-    if (inputFile != NULL)
-      fclose(inputFile);
-    freeGraph(head_ptr);
   }
+
+  if (inputFile != NULL)
+    fclose(inputFile);
+  freeGraph(head_ptr);
 
   free(command);
   free(arg1);
@@ -300,11 +300,24 @@ Node *initializeGraph() {
 void freeGraph(Node *graph) {
   Node *current = graph;
   while (current != NULL) {
-    free(current->name);
-    freeEdges(current->edgeList);
-    Node *next = current->next;
+    Node *nextNode = current->next;
+
+    // Free node name if it was allocated
+    if (current->name) {
+      free(current->name);
+    }
+
+    // Free all edges for the current node
+    Edge *edge = current->edgeList;
+    while (edge != NULL) {
+      Edge *nextEdge = edge->next;
+      free(edge);
+      edge = nextEdge;
+    }
+
+    // Free the current node itself
     free(current);
-    current = next;
+    current = nextNode;
   }
 }
 
@@ -379,61 +392,45 @@ int addNode(Node *graph, const char *nodeName) {
  * vertices in the graph. Notes: Does nothing if the edge already exists.
  */
 int addEdge(Node *graph, const char *vName1, const char *vName2) {
-  // Check nodes
   Node *ptr = graph;
-  int fromFound = 0;
-  int toFound = 0;
   Node *from = NULL;
   Node *to = NULL;
 
+  // Find both nodes in the graph
   while (ptr != NULL) {
     if (strcmp(ptr->name, vName1) == 0) {
-      fromFound = 1;
       from = ptr;
     } else if (strcmp(ptr->name, vName2) == 0) {
-      toFound = 1;
       to = ptr;
     }
-    if (fromFound && toFound)
+    if (from && to)
       break;
-
     ptr = ptr->next;
   }
 
-  if (!fromFound || !toFound) {
+  if (!from || !to) {
     handleError(ERROR_EDGE_MISSING_NODE);
     return 1;
   }
 
-  // Look for duplicate edge
+  // Check for duplicate edge
   Edge *edge = from->edgeList;
-  Edge *end = NULL;
-
   while (edge != NULL) {
-    if (strcmp(edge->destination->name, vName2) == 0) {
-      // Edge already exists
-      return 0;
+    if (edge->destination == to) {
+      return 0; // Edge already exists
     }
-    end = edge;
     edge = edge->next;
   }
 
-  // Allocate and add new edge
+  // Add new edge
   Edge *newEdge = malloc(sizeof(Edge));
   if (!newEdge) {
-    perror("Failed to allocate memory for new edge");
+    perror("Failed to allocate memory for edge");
     exit(1);
   }
   newEdge->destination = to;
-  newEdge->next = NULL;
-
-  if (from->edgeList == NULL) {
-    // First edge for this node
-    from->edgeList = newEdge;
-  } else {
-    // Append to the end of the list
-    end->next = newEdge;
-  }
+  newEdge->next = from->edgeList;
+  from->edgeList = newEdge;
 
   return 0;
 }
