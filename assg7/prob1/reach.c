@@ -67,25 +67,28 @@ int main(int argc, char *argv[]) {
   }
 
   char *inputLine = NULL;
-  char *command = NULL;
-  char *arg1 = NULL;
-  char *arg2 = NULL;
+  char *command = malloc(4 * sizeof(char));
+  char *arg1 = malloc(65 * sizeof(char));
+  char *arg2 = malloc(65 * sizeof(char));
+
+  if (command)
+    strcpy(command, "");
+  if (arg1)
+    strcpy(arg1, "");
+  if (arg2)
+    strcpy(arg2, "");
+
   Node *head_ptr = initializeGraph();
   int pathExists = 0;
 
   while (strlen(inputLine = getInput(inputFile)) > 0) {
-    command = malloc(4 * sizeof(char));
-    arg1 = malloc(65 * sizeof(char));
-    arg2 = malloc(65 * sizeof(char));
+
+    strcpy(command, "");
+    strcpy(arg1, "");
+    strcpy(arg2, "");
 
     if (parseInput(inputLine, command, arg1, arg2)) {
-      errorStatus = 1;
-      free(command);
-      free(arg1);
-      free(arg2);
-      command = NULL;
-      arg1 = NULL;
-      arg2 = NULL;
+      free(inputLine);
       continue;
     }
 
@@ -110,18 +113,14 @@ int main(int argc, char *argv[]) {
       break;
     }
 
-    free(command);
-    free(arg1);
-    free(arg2);
-    command = NULL;
-    arg1 = NULL;
-    arg2 = NULL;
+    if (inputFile != NULL)
+      fclose(inputFile);
+    freeGraph(head_ptr);
   }
 
-  if (inputFile != NULL)
-    fclose(inputFile);
-
-  freeGraph(head_ptr);
+  free(command);
+  free(arg1);
+  free(arg2);
 
   return errorStatus;
 }
