@@ -458,10 +458,12 @@ int searchPath(Node *graph, const char *startNode, const char *endNode) {
   while (ptr != NULL) {
     if (strcmp(ptr->name, startNode) == 0) {
       start = ptr;
-    } else if (strcmp(ptr->name, endNode) == 0) {
+    }
+    if (strcmp(ptr->name, endNode) == 0) {
       end = ptr;
     }
 
+    // Exit early if both found
     if (start != NULL && end != NULL)
       break;
 
