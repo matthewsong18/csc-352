@@ -74,8 +74,6 @@ int main(int argc, char *argv[]) {
   Node *head_ptr = initializeGraph();
   int pathExists = 0;
 
-  strcpy(inputLine, "");
-
   while (strlen(inputLine = getInput(inputFile)) > 0) {
     command = malloc(4 * sizeof(char));
     arg1 = malloc(65 * sizeof(char));
@@ -182,15 +180,33 @@ char *getInput(FILE *inputFile) {
   size_t linecap =
       0; // The capacity of the buffer at line which is allocated by getline
 
+  ssize_t length;
   // Check if there is an inputFile
   if (inputFile != NULL) {
 
     // Use inputFile if it exists
-    getline(&line, &linecap, inputFile);
+    length = getline(&line, &linecap, inputFile);
   } else {
 
     // Use stdin if inputFile does not exist
-    getline(&line, &linecap, stdin);
+    length = getline(&line, &linecap, stdin);
+  }
+
+  // Check for errors or EOF
+  if (length == -1) {
+    free(line);
+    return NULL;
+  }
+
+  // Trim any trailing newline and check for empty lines
+  if (length > 0 && line[length - 1] == '\n') {
+    line[length - 1] = '\0';
+  }
+
+  // Check if the line is empty after trimming
+  if (strlen(line) == 0) {
+    free(line);
+    return NULL;
   }
 
   return line;
