@@ -4,3 +4,4 @@ reach : reach.c
 clean:
 	rm -f reach
 	rm -f ./tests/outputs/*
+	rm -rf reach.dSYM

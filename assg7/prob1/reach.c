@@ -47,7 +47,77 @@ int addEdge(Node *graph, const char *vName1, const char *vName2);
 int searchPath(Node *graph, const char *startNode, const char *endNode);
 int depthFirstSearch(Node *currentNode, Node *targetNode);
 
-int main(int argc, char *argv[]) { return 0; }
+int main(int argc, char *argv[]) {
+  int errorStatus = 0;
+
+  if (argc > 1) {
+    handleError(ERROR_CLI_TOO_MANY_ARGS);
+    errorStatus = 1;
+  }
+
+  FILE *inputFile = NULL;
+
+  if (argc == 0 && argv[0] != NULL) {
+    inputFile = fopen(argv[0], "r");
+
+    if (inputFile == NULL) {
+      printf("Error opening file.\n");
+      return 1;
+    }
+  }
+
+  char *inputLine;
+  char *command;
+  char *arg1;
+  char *arg2;
+  Node *head_ptr = initializeGraph();
+  int pathExists = 0;
+
+  while (strlen(inputLine = getInput(inputFile)) > 0) {
+    command = malloc(4 * sizeof(char));
+    arg1 = malloc(65 * sizeof(char));
+    arg2 = malloc(65 * sizeof(char));
+
+    if (parseInput(inputLine, command, arg1, arg2)) {
+      errorStatus = 1;
+      free(command);
+      free(arg1);
+      free(arg2);
+      continue;
+    }
+
+    switch (command[1]) {
+    case 'n':
+      if (addNode(head_ptr, arg1)) {
+        errorStatus = 1;
+      }
+      break;
+
+    case 'e':
+      if (addEdge(head_ptr, arg1, arg2)) {
+        errorStatus = 1;
+      }
+      break;
+
+    case 'q':
+      pathExists = searchPath(head_ptr, arg1, arg2);
+
+      printf("%d\n",
+             pathExists); // pathExists = 1 if there is such a path, 0 otherwise
+      break;
+    }
+
+    free(command);
+    free(arg1);
+    free(arg2);
+  }
+
+  fclose(inputFile);
+
+  freeGraph(head_ptr);
+
+  return errorStatus;
+}
 
 /**
  * getInput
