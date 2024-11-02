@@ -78,6 +78,13 @@ int main(int argc, char *argv[]) {
     arg1 = malloc(65 * sizeof(char));
     arg2 = malloc(65 * sizeof(char));
 
+    if (command)
+      strcpy(command, "");
+    if (arg1)
+      strcpy(arg1, "");
+    if (arg2)
+      strcpy(arg2, "");
+
     if (parseInput(inputLine, command, arg1, arg2)) {
       errorStatus = 1;
       free(command);
