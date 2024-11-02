@@ -466,13 +466,19 @@ int searchPath(Node *graph, const char *startNode, const char *endNode) {
     ptr = ptr->next;
   }
 
-  // Check if either node was not found
   if (start == NULL || end == NULL) {
-    handleError(ERROR_EDGE_MISSING_NODE); // Or use an appropriate error
+    handleError(ERROR_EDGE_MISSING_NODE);
     return 0;
   }
 
-  return depthFirstSearch(start, end);
+  int result = depthFirstSearch(start, end);
+  Node *current = graph;
+  while (current != NULL) {
+    current->visited = 0;
+    current = current->next;
+  }
+
+  return result;
 }
 
 /**
@@ -488,7 +494,6 @@ int searchPath(Node *graph, const char *startNode, const char *endNode) {
  * Assumptions: visited array is pre-initialized; graph is valid.
  */
 int depthFirstSearch(Node *currentNode, Node *targetNode) {
-  // Implementation here
   if (currentNode == NULL || targetNode == NULL)
     return 0;
 
@@ -501,13 +506,11 @@ int depthFirstSearch(Node *currentNode, Node *targetNode) {
   while (ptr != NULL) {
     if (ptr->destination->visited == 0) {
       if (depthFirstSearch(ptr->destination, targetNode)) {
-        currentNode->visited = 0;
         return 1;
       }
     }
     ptr = ptr->next;
   }
 
-  currentNode->visited = 0;
   return 0;
 }
