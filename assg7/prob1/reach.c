@@ -196,6 +196,9 @@ char *getInput(FILE *inputFile) {
  * size.
  */
 int parseInput(const char *line, char *command, char *arg1, char *arg2) {
+  command = "";
+  arg1 = "";
+  arg2 = "";
   char extraArg[2] = "";
   sscanf(line, "%3s %64s %64s %1s", command, arg1, arg2, extraArg);
 
