@@ -1,6 +1,6 @@
 /**
  * File: reach.c
- * Author: Matthew W. Song
+ * Author:
  * Purpose: This program builds a directed graph based on input commands that
  * define nodes and edges. It checks if a path exists between specified nodes
  * using depth-first search, helping to analyze if certain "bad" states are
@@ -50,14 +50,14 @@ int depthFirstSearch(Node *currentNode, Node *targetNode);
 int main(int argc, char *argv[]) {
   int errorStatus = 0;
 
-  if (argc > 1) {
+  if (argc > 2) {
     handleError(ERROR_CLI_TOO_MANY_ARGS);
     errorStatus = 1;
   }
 
   FILE *inputFile = NULL;
 
-  if (argc == 0 && argv[0] != NULL) {
+  if (argc > 1) {
     inputFile = fopen(argv[0], "r");
 
     if (inputFile == NULL) {
@@ -112,7 +112,8 @@ int main(int argc, char *argv[]) {
     free(arg2);
   }
 
-  fclose(inputFile);
+  if (inputFile != NULL)
+    fclose(inputFile);
 
   freeGraph(head_ptr);
 
@@ -141,7 +142,7 @@ char *getInput(FILE *inputFile) {
   if (inputFile != NULL) {
 
     // Use inputFile if it exists
-    getline(&line, &linecap, stdin);
+    getline(&line, &linecap, inputFile);
   } else {
 
     // Use stdin if inputFile does not exist
@@ -163,7 +164,7 @@ char *getInput(FILE *inputFile) {
  * size.
  */
 int parseInput(const char *line, char *command, char *arg1, char *arg2) {
-  char extraArg[2];
+  char extraArg[2] = "";
   sscanf(line, "%3s %64s %64s %1s", command, arg1, arg2, extraArg);
 
   if (strlen(extraArg) > 0) {
@@ -282,12 +283,14 @@ Node *initializeGraph() {
  * Assumptions: graph is a valid pointer to an allocated node.
  */
 void freeGraph(Node *graph) {
-  if (graph == NULL)
-    return;
-
-  free(graph->name);
-  freeEdges(graph->edgeList);
-  freeGraph(graph->next);
+  Node *current = graph;
+  while (current != NULL) {
+    free(current->name);
+    freeEdges(current->edgeList);
+    Node *next = current->next;
+    free(current);
+    current = next;
+  }
 }
 
 /**
@@ -302,8 +305,8 @@ void freeEdges(Edge *edgeList) {
   if (edgeList == NULL)
     return;
 
-  freeGraph(edgeList->destination);
   freeEdges(edgeList->next);
+  free(edgeList);
 }
 
 /*
@@ -331,7 +334,7 @@ int addNode(Node *graph, const char *nodeName) {
 
   // Allocate memory
   Node *newNode = malloc(sizeof(Node));
-  newNode->name = malloc(strlen(nodeName) * sizeof(char));
+  newNode->name = malloc((strlen(nodeName) + 1) * sizeof(char));
   strcpy(newNode->name, nodeName);
 
   // Go to end of list
