@@ -332,7 +332,7 @@ int addNode(Node *graph, const char *nodeName) {
   // Allocate memory
   Node *newNode = malloc(sizeof(Node));
   newNode->name = malloc(strlen(nodeName) * sizeof(char));
-  strlcpy(newNode->name, nodeName, sizeof(newNode->name));
+  strcpy(newNode->name, nodeName);
 
   // Go to end of list
   while (graph->next != NULL)
