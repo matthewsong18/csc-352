@@ -494,11 +494,13 @@ int searchPath(Node *graph, const char *startNode, const char *endNode) {
  * Assumptions: visited array is pre-initialized; graph is valid.
  */
 int depthFirstSearch(Node *currentNode, Node *targetNode) {
-  if (currentNode == NULL || targetNode == NULL)
+  if (currentNode == NULL || targetNode == NULL) {
     return 0;
+  }
 
-  if (currentNode == targetNode)
+  if (currentNode == targetNode) {
     return 1;
+  }
 
   currentNode->visited = 1;
 
@@ -506,11 +508,14 @@ int depthFirstSearch(Node *currentNode, Node *targetNode) {
   while (ptr != NULL) {
     if (ptr->destination->visited == 0) {
       if (depthFirstSearch(ptr->destination, targetNode)) {
+        currentNode->visited = 0; // Reset before returning
         return 1;
       }
     }
     ptr = ptr->next;
   }
 
+  // Reset visited before backtracking to allow alternative paths
+  currentNode->visited = 0;
   return 0;
 }
