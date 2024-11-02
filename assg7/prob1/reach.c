@@ -195,22 +195,22 @@ char *getInput(FILE *inputFile) {
                      // store the line at
   size_t linecap =
       0; // The capacity of the buffer at line which is allocated by getline
+  ssize_t linelen;
 
   // Check if there is an inputFile
   if (inputFile != NULL) {
 
     // Use inputFile if it exists
-    getline(&line, &linecap, inputFile);
+    linelen = getline(&line, &linecap, inputFile);
   } else {
 
     // Use stdin if inputFile does not exist
-    getline(&line, &linecap, stdin);
+    linelen = getline(&line, &linecap, stdin);
   }
 
-  if (line == NULL) {
-    handleError(ERROR_MALLOC);
-    free(line);
-    exit(1);
+  if (linelen == -1) { // End of file or error
+    free(line);        // Free the allocated line if EOF or error
+    return NULL;
   }
 
   return line;
