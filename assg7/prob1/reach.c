@@ -468,7 +468,15 @@ int searchPath(Node *graph, const char *startNode, const char *endNode) {
     ptr = ptr->next;
   }
 
-  return depthFirstSearch(start, end);
+  int result = depthFirstSearch(start, end);
+
+  Node *new_ptr = graph;
+  while (graph != NULL) {
+    graph->visited = 0;
+    graph = graph->next;
+  }
+
+  return result;
 }
 
 /**
@@ -485,8 +493,15 @@ int searchPath(Node *graph, const char *startNode, const char *endNode) {
  */
 int depthFirstSearch(Node *currentNode, Node *targetNode) {
   // Implementation here
-  if (strcmp(currentNode->name, targetNode->name) == 0)
+  if (currentNode == targetNode) {
     return 1;
+  }
+
+  if (currentNode->visited == 1) {
+    return 0;
+  }
+
+  currentNode->visited = 1;
 
   Edge *ptr = currentNode->edgeList;
   while (ptr != NULL) {
