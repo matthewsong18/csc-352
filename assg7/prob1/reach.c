@@ -391,7 +391,8 @@ int addEdge(Node *graph, const char *vName1, const char *vName2) {
     if (strcmp(ptr->name, vName1) == 0) {
       fromFound = 1;
       from = ptr;
-    } else if (strcmp(ptr->name, vName2) == 0) {
+    }
+    if (strcmp(ptr->name, vName2) == 0) {
       toFound = 1;
       to = ptr;
     }
