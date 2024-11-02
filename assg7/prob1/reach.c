@@ -108,10 +108,10 @@ int main(int argc, char *argv[]) {
       Node *end = NULL;
       while (ptr != NULL) {
 
-        if (strcmp(ptr->name, startNode) == 0) {
+        if (strcmp(ptr->name, arg1) == 0) {
           start = ptr;
         }
-        if (strcmp(ptr->name, endNode) == 0) {
+        if (strcmp(ptr->name, arg2) == 0) {
           end = ptr;
         }
 
