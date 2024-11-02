@@ -32,7 +32,8 @@ typedef enum {
   ERROR_CLI_TOO_MANY_ARGS,
   ERROR_DUPLICATE_NODE,
   ERROR_EDGE_MISSING_NODE,
-  ERROR_BAD_INPUT_FILE
+  ERROR_BAD_INPUT_FILE,
+  ERROR_MALLOC
 } ErrorType;
 
 char *getInput(FILE *inputFile);
@@ -296,6 +297,9 @@ void handleError(ErrorType errorType) {
   case ERROR_BAD_INPUT_FILE:
     fprintf(stderr, "Error: input file cannot be found or cannot be read\n");
     break;
+  case ERROR_MALLOC:
+    fprintf(stderr, "ERROR: Ran out of memory\n");
+    break;
   }
 }
 
@@ -371,7 +375,14 @@ void freeEdges(Edge *edgeList) {
 int addNode(Node *graph, const char *nodeName) {
   if (graph->name == NULL) {
     graph->name = malloc((strlen(nodeName) + 1) * sizeof(char));
+    if (graph->name == NULL) {
+      handleError(ERROR_MALLOC);
+      exit(1);
+    }
     strcpy(graph->name, nodeName);
+    graph->edgeList = NULL;
+    graph->next = NULL;
+    graph->visited = 0;
     return 0;
   }
 
@@ -389,8 +400,15 @@ int addNode(Node *graph, const char *nodeName) {
 
   // Allocate memory
   Node *newNode = malloc(sizeof(Node));
+  if (newNode == NULL) {
+    handleError(ERROR_MALLOC);
+    exit(1);
+  }
   newNode->name = malloc((strlen(nodeName) + 1) * sizeof(char));
   strcpy(newNode->name, nodeName);
+  newNode->edgeList = NULL;
+  newNode->next = NULL;
+  newNode->visited = 0;
 
   // Go to end of list
   while (graph->next != NULL)
