@@ -89,6 +89,10 @@ int main(int argc, char *argv[]) {
       continue;
     }
 
+    Node *ptr;
+    Node *start = NULL;
+    Node *end = NULL;
+
     switch (command[1]) {
     case 'n':
       if (addNode(head_ptr, arg1)) {
@@ -103,9 +107,7 @@ int main(int argc, char *argv[]) {
       break;
 
     case 'q':
-      Node *ptr = head_ptr;
-      Node *start = NULL;
-      Node *end = NULL;
+      ptr = head_ptr;
       while (ptr != NULL) {
 
         if (strcmp(ptr->name, arg1) == 0) {
