@@ -71,10 +71,6 @@ int main(int argc, char *argv[]) {
   char *arg1 = malloc(65 * sizeof(char));
   char *arg2 = malloc(65 * sizeof(char));
 
-  command = "";
-  arg1 = "";
-  arg2 = "";
-
   Node *head_ptr = initializeGraph();
   int pathExists = 0;
 
@@ -141,6 +137,9 @@ int main(int argc, char *argv[]) {
   free(command);
   free(arg1);
   free(arg2);
+  command = NULL;
+  arg1 = NULL;
+  arg2 = NULL;
 
   return errorStatus;
 }
