@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  char *inputLine = NULL;
+  char *inputLine = "";
   char *command = NULL;
   char *arg1 = NULL;
   char *arg2 = NULL;
@@ -78,6 +78,19 @@ int main(int argc, char *argv[]) {
     command = malloc(4 * sizeof(char));
     arg1 = malloc(65 * sizeof(char));
     arg2 = malloc(65 * sizeof(char));
+
+    if (command == NULL) {
+      handleError(ERROR_MALLOC);
+      exit(1);
+    }
+    if (arg1 == NULL) {
+      handleError(ERROR_MALLOC);
+      exit(1);
+    }
+    if (arg2 == NULL) {
+      handleError(ERROR_MALLOC);
+      exit(1);
+    }
 
     if (command)
       strcpy(command, "");
