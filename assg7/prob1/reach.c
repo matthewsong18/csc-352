@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  char *inputLine = "";
+  char *inputLine = NULL;
   char *command = NULL;
   char *arg1 = NULL;
   char *arg2 = NULL;
