@@ -111,6 +111,8 @@ int main(int argc, char *argv[]) {
       continue;
     }
 
+    free(inputLine);
+
     Node *ptr;
     Node *start = NULL;
     Node *end = NULL;
@@ -170,8 +172,6 @@ int main(int argc, char *argv[]) {
     fclose(inputFile);
 
   freeGraph(head_ptr);
-
-  free(inputLine);
 
   return errorStatus;
 }
