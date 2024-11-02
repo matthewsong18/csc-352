@@ -211,6 +211,12 @@ char *getInput(FILE *inputFile) {
     line = NULL;
   }
 
+  if (line == NULL) {
+    handleError(ERROR_MALLOC);
+    free(line);
+    exit(1);
+  }
+
   return line;
 }
 
