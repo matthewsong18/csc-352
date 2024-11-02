@@ -473,9 +473,9 @@ int searchPath(Node *graph, const char *startNode, const char *endNode) {
   int result = depthFirstSearch(start, end);
 
   Node *new_ptr = graph;
-  while (graph != NULL) {
-    graph->visited = 0;
-    graph = graph->next;
+  while (new_ptr != NULL) {
+    new_ptr->visited = 0;
+    new_ptr = new_ptr->next;
   }
 
   return result;
