@@ -77,6 +77,7 @@ int main(int argc, char *argv[]) {
   while (strlen(inputLine = getInput(inputFile)) > 0) {
 
     if (inputLine == 0) {
+      free(inputLine);
       continue;
     }
 
