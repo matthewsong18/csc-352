@@ -67,25 +67,15 @@ int main(int argc, char *argv[]) {
   }
 
   char *inputLine = NULL;
-  char *command = NULL;
-  char *arg1 = NULL;
-  char *arg2 = NULL;
+  char command[4];
+  char arg1[65];
+  char arg2[65];
   Node *head_ptr = initializeGraph();
   int pathExists = 0;
 
   while (strlen(inputLine = getInput(inputFile)) > 0) {
-    command = malloc(4 * sizeof(char));
-    arg1 = malloc(65 * sizeof(char));
-    arg2 = malloc(65 * sizeof(char));
-
     if (parseInput(inputLine, command, arg1, arg2)) {
       errorStatus = 1;
-      free(command);
-      free(arg1);
-      free(arg2);
-      command = NULL;
-      arg1 = NULL;
-      arg2 = NULL;
       continue;
     }
 
@@ -135,13 +125,6 @@ int main(int argc, char *argv[]) {
              pathExists); // pathExists = 1 if there is such a path, 0 otherwise
       break;
     }
-
-    free(command);
-    free(arg1);
-    free(arg2);
-    command = NULL;
-    arg1 = NULL;
-    arg2 = NULL;
   }
 
   if (inputFile != NULL)
@@ -196,9 +179,6 @@ char *getInput(FILE *inputFile) {
  * size.
  */
 int parseInput(const char *line, char *command, char *arg1, char *arg2) {
-  command = "";
-  arg1 = "";
-  arg2 = "";
   char extraArg[2] = "";
   sscanf(line, "%3s %64s %64s %1s", command, arg1, arg2, extraArg);
 
