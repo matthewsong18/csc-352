@@ -74,6 +74,8 @@ int main(int argc, char *argv[]) {
   Node *head_ptr = initializeGraph();
   int pathExists = 0;
 
+  strcpy(inputLine, "");
+
   while (strlen(inputLine = getInput(inputFile)) > 0) {
     command = malloc(4 * sizeof(char));
     arg1 = malloc(65 * sizeof(char));
