@@ -206,12 +206,6 @@ char *getInput(FILE *inputFile) {
     success = getline(&line, &linecap, stdin);
   }
 
-  if (line == NULL) {
-    handleError(ERROR_MALLOC);
-    free(line);
-    exit(1);
-  }
-
   if (success == -1) {
     free(line);
     line = NULL;
