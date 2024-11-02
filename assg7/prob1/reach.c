@@ -75,12 +75,6 @@ int main(int argc, char *argv[]) {
   int pathExists = 0;
 
   while (strlen(inputLine = getInput(inputFile)) > 0) {
-
-    if (inputLine == 0) {
-      free(inputLine);
-      continue;
-    }
-
     command = malloc(4 * sizeof(char));
     arg1 = malloc(65 * sizeof(char));
     arg2 = malloc(65 * sizeof(char));
@@ -174,6 +168,8 @@ int main(int argc, char *argv[]) {
     arg2 = NULL;
   }
 
+  free(inputLine);
+
   if (inputFile != NULL)
     fclose(inputFile);
 
@@ -200,7 +196,6 @@ char *getInput(FILE *inputFile) {
   size_t linecap =
       0; // The capacity of the buffer at line which is allocated by getline
 
-  int success = 0;
   // Check if there is an inputFile
   if (inputFile != NULL) {
 
@@ -209,12 +204,7 @@ char *getInput(FILE *inputFile) {
   } else {
 
     // Use stdin if inputFile does not exist
-    success = getline(&line, &linecap, stdin);
-  }
-
-  if (success == -1) {
-    free(line);
-    return 0;
+    getline(&line, &linecap, stdin);
   }
 
   if (line == NULL) {
