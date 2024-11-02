@@ -8,6 +8,7 @@
  * and carefully manages memory for safety.
  */
 
+#include <ctype.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -82,6 +83,20 @@ int main(int argc, char *argv[]) {
   int pathExists = 0;
 
   while ((inputLine = getInput(inputFile)) != NULL && strlen(inputLine) > 0) {
+    int isWhitespaceOnly = 1;
+    for (char *p = inputLine; *p != '\0'; p++) {
+      if (!isspace((unsigned char)*p)) {
+        isWhitespaceOnly = 0;
+        break;
+      }
+    }
+
+    // Skip processing if the line is empty or whitespace-only
+    if (isWhitespaceOnly) {
+      free(inputLine);
+      printf("1\n");
+      continue;
+    }
 
     strcpy(command, "");
     strcpy(arg1, "");
@@ -508,14 +523,12 @@ int depthFirstSearch(Node *currentNode, Node *targetNode) {
   while (ptr != NULL) {
     if (ptr->destination->visited == 0) {
       if (depthFirstSearch(ptr->destination, targetNode)) {
-        currentNode->visited = 0; // Reset before returning
         return 1;
       }
     }
     ptr = ptr->next;
   }
 
-  // Reset visited before backtracking to allow alternative paths
   currentNode->visited = 0;
   return 0;
 }
