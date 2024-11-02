@@ -122,6 +122,8 @@ int main(int argc, char *argv[]) {
   free(arg1);
   free(arg2);
 
+  free(inputLine);
+
   return errorStatus;
 }
 
@@ -400,7 +402,8 @@ int addEdge(Node *graph, const char *vName1, const char *vName2) {
   while (ptr != NULL) {
     if (strcmp(ptr->name, vName1) == 0) {
       from = ptr;
-    } else if (strcmp(ptr->name, vName2) == 0) {
+    }
+    if (strcmp(ptr->name, vName2) == 0) {
       to = ptr;
     }
     if (from && to)
