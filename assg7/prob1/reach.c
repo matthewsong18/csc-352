@@ -1,6 +1,6 @@
 /**
  * File: reach.c
- * Author:
+ * Author: Matthew W. Song
  * Purpose: This program builds a directed graph based on input commands that
  * define nodes and edges. It checks if a path exists between specified nodes
  * using depth-first search, helping to analyze if certain "bad" states are
@@ -380,12 +380,12 @@ int addNode(Node *graph, const char *nodeName) {
  * vertices in the graph. Notes: Does nothing if the edge already exists.
  */
 int addEdge(Node *graph, const char *vName1, const char *vName2) {
-  // Checking nodes
+  // Check nodes
   Node *ptr = graph;
   int fromFound = 0;
   int toFound = 0;
-  Node *from;
-  Node *to;
+  Node *from = NULL;
+  Node *to = NULL;
 
   while (ptr != NULL) {
     if (strcmp(ptr->name, vName1) == 0) {
@@ -408,20 +408,33 @@ int addEdge(Node *graph, const char *vName1, const char *vName2) {
 
   // Look for duplicate edge
   Edge *edge = from->edgeList;
-  Edge *end;
+  Edge *end = NULL;
 
   while (edge != NULL) {
     if (strcmp(edge->destination->name, vName2) == 0) {
+      // Edge already exists
       return 0;
     }
-
     end = edge;
     edge = edge->next;
   }
 
+  // Allocate and add new edge
   Edge *newEdge = malloc(sizeof(Edge));
+  if (!newEdge) {
+    perror("Failed to allocate memory for new edge");
+    exit(1);
+  }
   newEdge->destination = to;
-  end->next = newEdge;
+  newEdge->next = NULL;
+
+  if (from->edgeList == NULL) {
+    // First edge for this node
+    from->edgeList = newEdge;
+  } else {
+    // Append to the end of the list
+    end->next = newEdge;
+  }
 
   return 0;
 }
