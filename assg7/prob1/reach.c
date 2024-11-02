@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
   FILE *inputFile = NULL;
 
   if (argc > 1) {
-    inputFile = fopen(argv[0], "r");
+    inputFile = fopen(argv[1], "r");
 
     if (inputFile == NULL) {
       printf("Error opening file.\n");
@@ -66,10 +66,10 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  char *inputLine;
-  char *command;
-  char *arg1;
-  char *arg2;
+  char *inputLine = NULL;
+  char *command = NULL;
+  char *arg1 = NULL;
+  char *arg2 = NULL;
   Node *head_ptr = initializeGraph();
   int pathExists = 0;
 
@@ -83,6 +83,9 @@ int main(int argc, char *argv[]) {
       free(command);
       free(arg1);
       free(arg2);
+      command = NULL;
+      arg1 = NULL;
+      arg2 = NULL;
       continue;
     }
 
@@ -110,6 +113,9 @@ int main(int argc, char *argv[]) {
     free(command);
     free(arg1);
     free(arg2);
+    command = NULL;
+    arg1 = NULL;
+    arg2 = NULL;
   }
 
   if (inputFile != NULL)
@@ -271,6 +277,16 @@ void handleError(ErrorType errorType) {
  */
 Node *initializeGraph() {
   Node *head_ptr = malloc(sizeof(Node));
+
+  if (head_ptr == NULL) {
+    fprintf(stderr, "Error: Memory ran out\n");
+    exit(1);
+  }
+
+  head_ptr->name = NULL;
+  head_ptr->edgeList = NULL;
+  head_ptr->next = NULL;
+  head_ptr->visited = 0;
   return head_ptr;
 }
 
@@ -320,6 +336,12 @@ void freeEdges(Edge *edgeList) {
  * Notes: Protects against buffer overflow by limiting nodeName length.
  */
 int addNode(Node *graph, const char *nodeName) {
+  if (graph->name == NULL) {
+    graph->name = malloc((strlen(nodeName) + 1) * sizeof(char));
+    strcpy(graph->name, nodeName);
+    return 0;
+  }
+
   // Check if graph contains node with name nodeName
   Node *ptr = graph;
   while (ptr != NULL) {
