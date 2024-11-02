@@ -467,6 +467,12 @@ int searchPath(Node *graph, const char *startNode, const char *endNode) {
     ptr = ptr->next;
   }
 
+  // Check if either node was not found
+  if (start == NULL || end == NULL) {
+    handleError(ERROR_EDGE_MISSING_NODE); // Or use an appropriate error
+    return 0;
+  }
+
   return depthFirstSearch(start, end);
 }
 
@@ -484,15 +490,25 @@ int searchPath(Node *graph, const char *startNode, const char *endNode) {
  */
 int depthFirstSearch(Node *currentNode, Node *targetNode) {
   // Implementation here
-  if (strcmp(currentNode->name, targetNode->name) == 0)
+  if (currentNode == NULL || targetNode == NULL)
+    return 0;
+
+  if (currentNode == targetNode)
     return 1;
+
+  currentNode->visited = 1;
 
   Edge *ptr = currentNode->edgeList;
   while (ptr != NULL) {
-    if (depthFirstSearch(ptr->destination, targetNode))
-      return 1;
+    if (ptr->destination->visited == 0) {
+      if (depthFirstSearch(ptr->destination, targetNode)) {
+        currentNode->visited = 0;
+        return 1;
+      }
+    }
     ptr = ptr->next;
   }
 
+  currentNode->visited = 0;
   return 0;
 }
