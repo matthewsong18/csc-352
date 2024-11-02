@@ -81,7 +81,7 @@ int main(int argc, char *argv[]) {
   Node *head_ptr = initializeGraph();
   int pathExists = 0;
 
-  while (strlen(inputLine = getInput(inputFile)) > 0) {
+  while ((inputLine = getInput(inputFile)) != NULL && strlen(inputLine) > 0) {
 
     strcpy(command, "");
     strcpy(arg1, "");
