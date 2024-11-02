@@ -103,6 +103,30 @@ int main(int argc, char *argv[]) {
       break;
 
     case 'q':
+      Node *ptr = head_ptr;
+      Node *start = NULL;
+      Node *end = NULL;
+      while (ptr != NULL) {
+
+        if (strcmp(ptr->name, startNode) == 0) {
+          start = ptr;
+        }
+        if (strcmp(ptr->name, endNode) == 0) {
+          end = ptr;
+        }
+
+        // Exit early if both found
+        if (start != NULL && end != NULL)
+          break;
+
+        ptr = ptr->next;
+      }
+
+      if (start == NULL || end == NULL) {
+        handleError(ERROR_EDGE_MISSING_NODE);
+        break;
+      }
+
       pathExists = searchPath(head_ptr, arg1, arg2);
 
       printf("%d\n",
