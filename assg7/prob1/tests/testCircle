@@ -1,0 +1,9 @@
+@n a1
+@n a2
+@n a3
+@e a1 a2
+@e a2 a3
+@e a3 a1
+@q a1 a3
+@q a3 a1
+
