@@ -91,10 +91,10 @@ int main(int argc, char *argv[]) {
       free(command);
       free(arg1);
       free(arg2);
+      free(inputLine);
       command = NULL;
       arg1 = NULL;
       arg2 = NULL;
-      inputLine = NULL;
       continue;
     }
 
