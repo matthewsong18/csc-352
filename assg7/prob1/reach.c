@@ -194,20 +194,26 @@ char *getInput(FILE *inputFile) {
   size_t linecap =
       0; // The capacity of the buffer at line which is allocated by getline
 
+  ssize_t length;
   // Check if there is an inputFile
   if (inputFile != NULL) {
 
     // Use inputFile if it exists
-    getline(&line, &linecap, inputFile);
+    length = getline(&line, &linecap, inputFile);
   } else {
 
     // Use stdin if inputFile does not exist
-    getline(&line, &linecap, stdin);
+    length = getline(&line, &linecap, stdin);
   }
 
   if (line == NULL) {
     handleError(ERROR_MALLOC);
     exit(1);
+  }
+
+  if (length <= 0) {
+    free(line);
+    return NULL;
   }
 
   return line;
