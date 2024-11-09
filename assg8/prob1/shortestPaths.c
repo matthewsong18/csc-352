@@ -1,9 +1,18 @@
+/*
+ * File: graph.c
+ * Author: Matthew W Song
+ * Purpose: Implements a graph data structure, including nodes and edges,
+ *          and provides functionality for reading input files, handling user
+ *          queries, and calculating the shortest path between nodes.
+ */
+
 #include <ctype.h>
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+// Error enums used for easy error handling
 typedef enum ErrorType {
   ERROR_INPUT_FILE,
   ERROR_CLI_ARGS,
@@ -28,6 +37,11 @@ typedef struct Edge {
   int weight;
 } Edge;
 
+typedef struct PQNode {
+  Node *node;
+  struct PQNode *next;
+} PQNode;
+
 const int STATUS_OKAY = 0;
 const int STATUS_ERROR = 1;
 
@@ -44,6 +58,8 @@ void addNodes(Node **headPtr, Node *node1, Node *node2);
 int parseQuery(char *line, char **name1, char **name2);
 int shortestPathAlgorithm(Node *graphPtr, Node *node1, Node *node2);
 int calculateDistance(Node *node);
+void insertNode(PQNode **head, Node *node);
+Node *extractMin(PQNode **head);
 
 int main(int argc, char *argv[]) {
   int errorStatus = STATUS_OKAY;
@@ -81,7 +97,18 @@ int main(int argc, char *argv[]) {
   return errorStatus;
 }
 
-// Get inputFile filename
+/*
+ * getInputFile(argc, argv, filename) -- Extracts the input filename from
+ * command-line arguments.
+ * Arguments:
+ *   argc - number of command-line arguments
+ *   argv - array of command-line arguments
+ *   filename - pointer to store the extracted filename
+ * Returns:
+ *   STATUS_OKAY on success, STATUS_ERROR if there's an error with arguments
+ *   or memory allocation.
+ */
+
 int getInputFile(int argc, char **argv, char **filename) {
   if (argc != 2) {
     handleError(ERROR_CLI_ARGS);
@@ -97,6 +124,14 @@ int getInputFile(int argc, char **argv, char **filename) {
   return STATUS_OKAY;
 }
 
+/*
+ * handleError(error) -- Outputs an appropriate error message based on the
+ * given error type.
+ * Arguments:
+ *   error - an ErrorType value indicating the type of error
+ * Returns:
+ *   None (void)
+ */
 void handleError(ErrorType error) {
   switch (error) {
   case ERROR_INPUT_FILE:
@@ -123,6 +158,15 @@ void handleError(ErrorType error) {
   }
 }
 
+/*
+ * makeGraph(filename, headPtr) -- Reads the graph data from a file and
+ * creates the corresponding graph structure.
+ * Arguments:
+ *   filename - name of the input file containing graph data
+ *   headPtr - pointer to the head of the Node linked list
+ * Returns:
+ *   STATUS_OKAY on success, STATUS_ERROR on failure (e.g., file read error).
+ */
 int makeGraph(char *filename, Node **headPtr) {
   int errorStatus = STATUS_OKAY;
   FILE *inputFile = fopen(filename, "r");
@@ -151,6 +195,7 @@ int makeGraph(char *filename, Node **headPtr) {
     if (parseStatus == STATUS_ERROR) {
       handleError(ERROR_PARSE_LINE);
       errorStatus = STATUS_ERROR;
+      continue;
     }
 
     Node *node1 = NULL;
@@ -163,6 +208,8 @@ int makeGraph(char *filename, Node **headPtr) {
       node2 = createNode(name2);
       addEdges(node1, node2, distance);
       addNodes(headPtr, node1, node2);
+      free(name1);
+      free(name2);
       continue;
     }
 
@@ -200,6 +247,14 @@ int makeGraph(char *filename, Node **headPtr) {
   return errorStatus;
 }
 
+/*
+ * freeGraph(graphPtr) -- Frees memory allocated for the entire graph
+ * structure, including nodes and edges.
+ * Arguments:
+ *   graphPtr - pointer to the head of the graph Node list
+ * Returns:
+ *   None (void)
+ */
 void freeGraph(Node *graphPtr) {
   Node *currentNode = graphPtr;
   while (currentNode != NULL) {
@@ -220,6 +275,17 @@ void freeGraph(Node *graphPtr) {
   }
 }
 
+/*
+ * parseLine(line, name1, name2, distance) -- Parses a line from the input
+ * file to extract node names and edge distance.
+ * Arguments:
+ *   line - input line to parse
+ *   name1 - pointer to store the first node name
+ *   name2 - pointer to store the second node name
+ *   distance - pointer to store the edge distance
+ * Returns:
+ *   STATUS_OKAY on successful parsing, STATUS_ERROR if parsing fails.
+ */
 int parseLine(const char *line, char **name1, char **name2, int *distance) {
   int errorStatus = STATUS_OKAY;
 
@@ -263,6 +329,14 @@ int parseLine(const char *line, char **name1, char **name2, int *distance) {
   return errorStatus;
 }
 
+/*
+ * isAlphabetic(name) -- Checks if a given string contains only alphabetic
+ * characters.
+ * Arguments:
+ *   name - string to check
+ * Returns:
+ *   1 if the string is alphabetic, 0 otherwise.
+ */
 int isAlphabetic(const char *name) {
   int isAlpha = 1;
 
@@ -275,6 +349,13 @@ int isAlphabetic(const char *name) {
   return isAlpha;
 }
 
+/*
+ * createNode(name) -- Creates a new Node with the given name.
+ * Arguments:
+ *   name - name for the new node
+ * Returns:
+ *   A pointer to the newly created Node, or exits if memory allocation fails.
+ */
 Node *createNode(char *name) {
   Node *node = malloc(sizeof(Node));
   if (node == NULL) {
@@ -308,6 +389,16 @@ Edge *createEdge(Node *target, int distance) {
   return edge;
 }
 
+/*
+ * addEdges(node1, node2, distance) -- Adds an edge between two nodes with
+ * a specified distance.
+ * Arguments:
+ *   node1 - pointer to the first Node
+ *   node2 - pointer to the second Node
+ *   distance - weight of the edge between node1 and node2
+ * Returns:
+ *   None (void)
+ */
 void addEdges(Node *node1, Node *node2, int distance) {
   if (node1->edgeList == NULL) {
     node1->edgeList = createEdge(node2, distance);
@@ -356,6 +447,16 @@ void addEdges(Node *node1, Node *node2, int distance) {
   }
 }
 
+/*
+ * addNodes(headPtr, node1, node2) -- Adds nodes to the graph if they don't
+ * already exist.
+ * Arguments:
+ *   headPtr - pointer to the head of the Node linked list
+ *   node1 - pointer to the first Node to add
+ *   node2 - pointer to the second Node to add
+ * Returns:
+ *   None (void)
+ */
 void addNodes(Node **headPtr, Node *node1, Node *node2) {
   int isNode1Found = 0;
   int isNode2Found = 0;
@@ -394,7 +495,14 @@ void addNodes(Node **headPtr, Node *node1, Node *node2) {
   }
 }
 
-// Read in all user queries
+/*
+ * handleUserQueries(graphPtr) -- Processes user queries to calculate
+ * shortest paths in the graph.
+ * Arguments:
+ *   graphPtr - pointer to the head of the graph Node list
+ * Returns:
+ *   STATUS_OKAY on successful handling of queries, STATUS_ERROR on failure.
+ */
 int handleUserQueries(Node *graphPtr) {
   int errorStatus = STATUS_OKAY;
 
@@ -414,6 +522,7 @@ int handleUserQueries(Node *graphPtr) {
 
     if (parseStatus == STATUS_ERROR) {
       errorStatus = STATUS_ERROR;
+      continue;
     }
 
     Node *current = graphPtr;
@@ -446,15 +555,25 @@ int handleUserQueries(Node *graphPtr) {
     // Find shortest path
     int algorithmStatus = shortestPathAlgorithm(graphPtr, node1, node2);
 
-    if (algorithmStatus == STATUS_ERROR)
+    if (algorithmStatus == STATUS_ERROR) {
       errorStatus = STATUS_ERROR;
-
-    printf("%d\n", node2->minDist);
+      continue;
+    }
   }
 
   return errorStatus;
 }
 
+/*
+ * parseQuery(line, name1, name2) -- Parses a user query to extract two node
+ * names.
+ * Arguments:
+ *   line - query line to parse
+ *   name1 - pointer to store the first node name from the query
+ *   name2 - pointer to store the second node name from the query
+ * Returns:
+ *   STATUS_OKAY on success, STATUS_ERROR if parsing fails.
+ */
 int parseQuery(char *line, char **name1, char **name2) {
   int errorStatus = STATUS_OKAY;
 
@@ -470,7 +589,9 @@ int parseQuery(char *line, char **name1, char **name2) {
     exit(1);
   }
 
-  int parseStatus = sscanf(line, "%64s %64s", *name1, *name2);
+  char extra[2] = "";
+
+  int parseStatus = sscanf(line, "%64s %64s %1s", *name1, *name2, extra);
 
   if (parseStatus != 2) {
     handleError(ERROR_PARSE_LINE);
@@ -484,54 +605,124 @@ int parseQuery(char *line, char **name1, char **name2) {
   return errorStatus;
 }
 
-// Calculate the shortest path using Djisktra's algorithm (Assuming there
-// are no negative paths)
+/*
+ * shortestPathAlgorithm(graphPtr, node1, node2) -- Calculates the shortest
+ * path between two nodes using Dijkstra's algorithm.
+ * Arguments:
+ *   graphPtr - pointer to the head of the graph Node list
+ *   node1 - pointer to the start Node for the path
+ *   node2 - pointer to the destination Node for the path
+ * Returns:
+ *   STATUS_OKAY if path is found, STATUS_ERROR if no path exists.
+ */
 int shortestPathAlgorithm(Node *graphPtr, Node *node1, Node *node2) {
   int errorStatus = STATUS_OKAY;
-  Node *current = graphPtr;
 
-  // Initialization
+  // Initialize all nodes
+  Node *current = graphPtr;
   while (current != NULL) {
     current->minDist = INT_MAX;
     current->visited = 0;
-
     current = current->next;
   }
   node1->minDist = 0;
 
-  int calculationStatus = calculateDistance(node1);
-  if (calculationStatus == STATUS_ERROR) {
+  // Initialize the priority queue
+  PQNode *priorityQueue = NULL;
+
+  // Insert the start node into the priority queue
+  insertNode(&priorityQueue, node1);
+
+  while (priorityQueue != NULL) {
+    // Extract the node with the smallest minDist
+    Node *currentNode = extractMin(&priorityQueue);
+
+    if (currentNode->visited)
+      continue;
+
+    currentNode->visited = 1;
+
+    // For each neighbor of currentNode
+    Edge *edge = currentNode->edgeList;
+    while (edge != NULL) {
+      Node *neighbor = edge->destination;
+
+      // Calculate the new tentative distance
+      int newDist = currentNode->minDist + edge->weight;
+
+      if (newDist < neighbor->minDist) {
+        neighbor->minDist = newDist;
+        // Insert neighbor into the priority queue
+        insertNode(&priorityQueue, neighbor);
+      }
+
+      edge = edge->next;
+    }
+  }
+
+  if (node2->minDist == INT_MAX) {
+    // No path found
+    handleError(ERROR_MISSING_EDGE);
     errorStatus = STATUS_ERROR;
+  } else {
+    // The shortest distance is in node2->minDist
+    printf("%d\n", node2->minDist);
   }
 
   return errorStatus;
 }
 
-int calculateDistance(Node *node) {
-  if (node->visited)
-    return STATUS_OKAY;
+/*
+ * insertNode(head, node) -- Inserts a node into a priority queue based on
+ * its minDist value.
+ * Arguments:
+ *   head - pointer to the head of the priority queue
+ *   node - pointer to the Node to insert
+ * Returns:
+ *   None (void)
+ */
+void insertNode(PQNode **head, Node *node) {
+  PQNode *newPQNode = malloc(sizeof(PQNode));
+  if (newPQNode == NULL) {
+    handleError(ERROR_MALLOC);
+    exit(1);
+  }
+  newPQNode->node = node;
+  newPQNode->next = NULL;
 
-  node->visited = 1;
-
-  if (node->edgeList == NULL) {
-    handleError(ERROR_MISSING_EDGE);
-    return STATUS_ERROR;
+  // If the queue is empty or the new node has smaller minDist than the head
+  if (*head == NULL || node->minDist < (*head)->node->minDist) {
+    newPQNode->next = *head;
+    *head = newPQNode;
+    return;
   }
 
-  Edge *currentEdge = node->edgeList;
-  while (currentEdge != NULL) {
-    int distance = node->minDist + currentEdge->weight;
-
-    if (node->minDist == INT_MAX)
-      distance = currentEdge->weight;
-
-    if (distance < currentEdge->destination->minDist)
-      currentEdge->destination->minDist = distance;
-
-    calculateDistance(currentEdge->destination);
-
-    currentEdge = currentEdge->next;
+  // Find the correct position to insert
+  PQNode *current = *head;
+  while (current->next != NULL &&
+         current->next->node->minDist <= node->minDist) {
+    current = current->next;
   }
+  newPQNode->next = current->next;
+  current->next = newPQNode;
+}
 
-  return STATUS_OKAY;
+/*
+ * extractMin(head) -- Extracts and removes the Node with the smallest minDist
+ * from the priority queue.
+ * Arguments:
+ *   head - pointer to the head of the priority queue
+ * Returns:
+ *   Pointer to the Node with the smallest minDist, or NULL if the queue is
+ *   empty.
+ */
+Node *extractMin(PQNode **head) {
+  if (*head == NULL) {
+    return NULL;
+  }
+  PQNode *minPQNode = *head;
+  Node *minNode = minPQNode->node;
+  *head = minPQNode->next;
+  free(minPQNode);
+  return minNode;
 }
