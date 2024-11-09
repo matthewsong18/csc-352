@@ -22,6 +22,7 @@ typedef enum ErrorType {
   ERROR_MISSING_NODE,
   ERROR_MISSING_EDGE,
   ERROR_NON_ALPHA,
+  ERROR_NEGATIVE,
 } ErrorType;
 
 typedef struct Node {
@@ -158,6 +159,9 @@ void handleError(ErrorType error) {
     break;
   case ERROR_NON_ALPHA:
     fprintf(stderr, "ERROR: Input name is not alphabetical\n");
+    break;
+  case ERROR_NEGATIVE:
+    fprintf(stderr, "ERROR: Negatives are not allowed\n");
     break;
   }
 }
@@ -316,6 +320,12 @@ int parseLine(const char *line, char **name1, char **name2, int *distance) {
     *name2 = NULL;
   }
 
+  if (*name1 == NULL || *name2 == NULL) {
+    handleError(ERROR_SCAN_LINE);
+    errorStatus = STATUS_ERROR;
+    return errorStatus;
+  }
+
   if (!isAlphabetic(*name1)) {
     handleError(ERROR_NON_ALPHA);
     errorStatus = STATUS_ERROR;
@@ -331,7 +341,8 @@ int parseLine(const char *line, char **name1, char **name2, int *distance) {
   }
 
   if (*distance < 0) {
-    *distance = 0;
+    handleError(ERROR_NEGATIVE);
+    errorStatus = STATUS_ERROR;
   }
 
   return errorStatus;
