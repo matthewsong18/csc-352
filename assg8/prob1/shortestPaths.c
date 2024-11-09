@@ -320,6 +320,7 @@ int parseLine(char *line, char **name1, char **name2, int *distance) {
     *name1 = NULL;
     *name2 = NULL;
     line = NULL;
+    return errorStatus;
   }
 
   if (*name1 == NULL || *name2 == NULL) {
