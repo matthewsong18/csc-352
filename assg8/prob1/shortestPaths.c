@@ -21,6 +21,7 @@ typedef enum ErrorType {
   ERROR_SCAN_LINE,
   ERROR_MISSING_NODE,
   ERROR_MISSING_EDGE,
+  ERROR_NON_ALPHA,
 } ErrorType;
 
 typedef struct Node {
@@ -154,6 +155,9 @@ void handleError(ErrorType error) {
     break;
   case ERROR_MISSING_EDGE:
     fprintf(stderr, "ERROR: Could not find edge\n");
+    break;
+  case ERROR_NON_ALPHA:
+    fprintf(stderr, "ERROR: Input name is not alphabetical\n");
     break;
   }
 }
@@ -313,11 +317,15 @@ int parseLine(const char *line, char **name1, char **name2, int *distance) {
   }
 
   if (!isAlphabetic(*name1)) {
+    handleError(ERROR_NON_ALPHA);
+    errorStatus = STATUS_ERROR;
     free(*name1);
     *name1 = NULL;
   }
 
   if (!isAlphabetic(*name2)) {
+    handleError(ERROR_NON_ALPHA);
+    errorStatus = STATUS_ERROR;
     free(*name2);
     *name2 = NULL;
   }
