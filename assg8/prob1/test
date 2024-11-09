@@ -10,7 +10,7 @@ for test_file in tests/test*; do
 	
   # 1: Run my program
     	
-  ./$1 $2 < "$test_file" > tests/outputs/"$test_name"MyOut 2> tests/outputs/"$test_name"MyErr
+  ./shortestPaths $1 < "$test_file" > tests/outputs/"$test_name"MyOut 2> tests/outputs/"$test_name"MyErr
     
 	# 2: To myOut
 
@@ -18,7 +18,7 @@ for test_file in tests/test*; do
     
 	# 3: Run example program
     
-	./ex$1 $2 < "$test_file" > tests/outputs/"$test_name"ExOut 2> tests/outputs/"$test_name"ExErr
+	./exShortestPaths $1 < "$test_file" > tests/outputs/"$test_name"ExOut 2> tests/outputs/"$test_name"ExErr
     
 	# 4: To exOut
   echo $? >> tests/outputs/"$test_name"ExOut
