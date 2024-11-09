@@ -197,7 +197,6 @@ int makeGraph(char *filename, Node **headPtr) {
     // Read line
     int parseStatus = parseLine(line, &name1, &name2, &distance);
 
-    free(line);
     line = NULL;
 
     if (parseStatus == STATUS_ERROR) {
@@ -324,6 +323,7 @@ int parseLine(char *line, char **name1, char **name2, int *distance) {
   if (*name1 == NULL || *name2 == NULL) {
     handleError(ERROR_SCAN_LINE);
     errorStatus = STATUS_ERROR;
+    free(line);
     return errorStatus;
   }
 
@@ -546,7 +546,6 @@ int handleUserQueries(Node *graphPtr) {
     // Get names
     int parseStatus = parseQuery(line, &name1, &name2);
 
-    free(line);
     line = NULL;
 
     if (parseStatus == STATUS_ERROR) {
