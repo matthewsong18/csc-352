@@ -252,6 +252,9 @@ int makeGraph(char *filename, Node **headPtr) {
     free(name2);
   }
 
+  free(line);
+  line = NULL;
+
   free(filename);
 
   return errorStatus;
@@ -595,6 +598,9 @@ int handleUserQueries(Node *graphPtr) {
     }
   }
 
+  free(line);
+  line = NULL;
+
   return errorStatus;
 }
 
@@ -614,12 +620,14 @@ int parseQuery(char *line, char **name1, char **name2) {
   *name1 = malloc(65 * sizeof(char));
   if (*name1 == NULL) {
     handleError(ERROR_MALLOC);
+    free(line);
     exit(1);
   }
 
   *name2 = malloc(65 * sizeof(char));
   if (*name2 == NULL) {
     handleError(ERROR_MALLOC);
+    free(line);
     exit(1);
   }
 
