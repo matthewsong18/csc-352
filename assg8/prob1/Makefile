@@ -1,6 +1,7 @@
+FLGS_DEBUG = -Wall -g
+
 shortestPaths : shortestPaths.c
-	gcc -Wall -g -o shortestPaths shortestPaths
+	gcc ${FLGS_DEBUG} -o shortestPaths shortestPaths.c
 
 clean:
-	rm -f shortestPaths
-	rm -f ./tests/outputs/*
+	rm -f *.o shortestPaths ./tests/outputs/*

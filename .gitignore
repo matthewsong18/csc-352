@@ -135,3 +135,6 @@ fabric.properties
 # Android studio 3.1+ serialized cache file
 .idea/caches/build_file_checksums.ser
 assg7/prob1/reach
+assg8/prob1/shortestPaths
+assg8/prob1/.idea
+assg8/prob1/tests/outputs/*

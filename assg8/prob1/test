@@ -1,0 +1,31 @@
+#!/bin/bash
+
+make
+
+for test_file in tests/test*; do
+
+	test_name="${test_file#tests/}"
+
+	echo "$test_name"
+	
+  # 1: Run my program
+    	
+  ./$1 $2 < "$test_file" > tests/outputs/"$test_name"MyOut 2> tests/outputs/"$test_name"MyErr
+    
+	# 2: To myOut
+
+  echo $? >> tests/outputs/"$test_name"MyOut
+    
+	# 3: Run example program
+    
+	./ex$1 $2 < "$test_file" > tests/outputs/"$test_name"ExOut 2> tests/outputs/"$test_name"ExErr
+    
+	# 4: To exOut
+  echo $? >> tests/outputs/"$test_name"ExOut
+
+  # 5: Print test results
+  printf "Test File $test_name\n"
+  printf "stdout diffs: $(diff tests/outputs/"$test_name"ExOut tests/outputs/"$test_name"MyOut)\n"
+  printf "stderr diffs: $(diff tests/outputs/"$test_name"ExErr tests/outputs/"$test_name"MyErr)\n"
+  printf "\n"
+done
