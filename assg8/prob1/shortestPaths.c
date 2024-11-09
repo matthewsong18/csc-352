@@ -197,16 +197,14 @@ int makeGraph(char *filename, Node **headPtr) {
     // Read line
     int parseStatus = parseLine(line, &name1, &name2, &distance);
 
-    if (line != NULL) {
-      free(line);
-      line = NULL;
-    }
-
     if (parseStatus == STATUS_ERROR) {
       handleError(ERROR_PARSE_LINE);
       errorStatus = STATUS_ERROR;
       continue;
     }
+
+    free(line);
+    line = NULL;
 
     Node *node1 = NULL;
     Node *node2 = NULL;
@@ -558,15 +556,13 @@ int handleUserQueries(Node *graphPtr) {
     // Get names
     int parseStatus = parseQuery(line, &name1, &name2);
 
-    if (line != NULL) {
-      free(line);
-      line = NULL;
-    }
-
     if (parseStatus == STATUS_ERROR) {
       errorStatus = STATUS_ERROR;
       continue;
     }
+
+    free(line);
+    line = NULL;
 
     Node *current = graphPtr;
     Node *node1 = NULL;
