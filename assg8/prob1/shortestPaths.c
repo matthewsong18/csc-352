@@ -52,7 +52,7 @@ void handleError(ErrorType error);
 int makeGraph(char *filename, Node **headPtr);
 int handleUserQueries(Node *graphPtr);
 void freeGraph(Node *graphPtr);
-int parseLine(const char *line, char **name1, char **name2, int *distance);
+int parseLine(char *line, char **name1, char **name2, int *distance);
 int isAlphabetic(const char *name);
 Node *createNode(char *name);
 void addEdges(Node *node1, Node *node2, int distance);
@@ -294,7 +294,7 @@ void freeGraph(Node *graphPtr) {
  * Returns:
  *   STATUS_OKAY on successful parsing, STATUS_ERROR if parsing fails.
  */
-int parseLine(const char *line, char **name1, char **name2, int *distance) {
+int parseLine(char *line, char **name1, char **name2, int *distance) {
   int errorStatus = STATUS_OKAY;
 
   *name1 = malloc(65 * sizeof(char));
@@ -316,6 +316,7 @@ int parseLine(const char *line, char **name1, char **name2, int *distance) {
     errorStatus = STATUS_ERROR;
     free(*name1);
     free(*name2);
+    free(line);
     *name1 = NULL;
     *name2 = NULL;
   }
@@ -330,19 +331,28 @@ int parseLine(const char *line, char **name1, char **name2, int *distance) {
     handleError(ERROR_NON_ALPHA);
     errorStatus = STATUS_ERROR;
     free(*name1);
+    free(*name2);
+    free(line);
     *name1 = NULL;
+    return errorStatus;
   }
 
   if (!isAlphabetic(*name2)) {
     handleError(ERROR_NON_ALPHA);
     errorStatus = STATUS_ERROR;
+    free(*name1);
     free(*name2);
+    free(line);
     *name2 = NULL;
+    return errorStatus;
   }
 
   if (*distance < 0) {
     handleError(ERROR_NEGATIVE);
     errorStatus = STATUS_ERROR;
+    free(*name1);
+    free(*name2);
+    free(line);
   }
 
   return errorStatus;
@@ -617,6 +627,7 @@ int parseQuery(char *line, char **name1, char **name2) {
     errorStatus = STATUS_ERROR;
     free(*name1);
     free(*name2);
+    free(line);
     *name1 = NULL;
     *name2 = NULL;
   }
