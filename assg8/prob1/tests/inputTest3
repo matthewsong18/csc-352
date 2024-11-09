@@ -1,0 +1,17 @@
+Node1 Node2 5
+Node3 Node4 10
+NodeWithExactlySixtyFourCharactersxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx Node5 15
+Node6 NodeWithSixtyFiveCharactersxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 20
+Node7 Node8 -25
+Node9 Node10
+Node11 Node12 twenty
+Node13 Node14 30 extra_field
+Node15 35
+Node@16 Node17 40
+Node18 Node19 0
+Node20 Node21 2147483648
+Node22 Node22 50
+Node23 Node24 55
+Node1 Node2 5
+Node25 NodeWithSpaces InName 60
+Node26 Node27 65
