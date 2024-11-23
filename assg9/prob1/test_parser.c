@@ -1,4 +1,6 @@
+#include "graph.h"
 #include "parser.h"
+#include "safety.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -51,14 +53,14 @@ int test_parse_line() {
 
   if (!target) {
     printf("ERROR: Target is NULL\n");
-    safe_free((void **)&root);
+    free_graph(root);
     return 0;
   }
 
   if (strcmp(root->next->name, "spellcheck.o") != 0) {
     printf("ERROR: root target list was not correct\n");
     printf("%s\n", root->next->name);
-    safe_free((void **)&root);
+    free_graph(root);
     safe_free((void **)&target);
     return 0;
   }
@@ -66,10 +68,14 @@ int test_parse_line() {
   if (strcmp(target->name, "spellcheck.o") != 0) {
     printf("ERROR: target was not correct\n");
     printf("%s\n", target->name);
-    safe_free((void **)&root);
+    free_graph(root);
     safe_free((void **)&target);
     return 0;
   }
+
+  free_graph(root);
+
+  check_for_leaks();
 
   return 1;
 }
@@ -137,6 +143,8 @@ int test_parse_example_makefile() {
   }
 
   free_graph(graph);
+
+  check_for_leaks();
   return 1;
 }
 
@@ -168,5 +176,7 @@ int test_find_target_in_example() {
   }
 
   free_graph(graph);
+
+  check_for_leaks();
   return 1;
 }

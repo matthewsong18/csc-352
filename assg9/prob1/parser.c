@@ -120,6 +120,7 @@ void parse_line(const char *line, Node **root, Node **target) {
   }
 
   safe_free((void **)&buffer);
+  safe_free((void **)&target_name);
 }
 
 Node *find_target(Node *root, const char *target_name) {

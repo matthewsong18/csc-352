@@ -37,6 +37,7 @@ void safe_free(void **ptr) {
     allocation_count--;
     free(*ptr);
     *ptr = NULL;
+    ptr = NULL;
   }
 }
 
