@@ -30,7 +30,6 @@ int main(int argc, char **argv) {
 
   // Free allocated memory
   free_graph(root->next);
-  free(target);
   free_graph(root);
 
   return errorStatus;
