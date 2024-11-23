@@ -42,7 +42,7 @@ int find_dependency(Node *target, const char *dependency) {
     if (strcmp(dependencies->name, dependency) == 0) {
       return 1;
     }
-    dependencies = dependencies->next;
+    dependencies = dependencies->dependencies;
   }
   return 0;
 }
@@ -52,11 +52,6 @@ void add_dependency(Node *target, Node *dependency) {
   // Handle bad input
   if (!target || !dependency) {
     handle_error("ERROR: NULL values passed into add_dependency\n");
-  }
-
-  // Handle duplicate
-  if (find_dependency(target, dependency->name)) {
-    handle_error("ERROR: Attempting to add duplicate dependency\n");
   }
 
   // Handle empty dependencies
