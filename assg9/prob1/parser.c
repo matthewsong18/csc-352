@@ -77,6 +77,8 @@ void parse_line(const char *line, Node **root, Node **target) {
   // Handle target not found
   *target = create_node(target_name);
 
+  safe_free((void **)&target_name);
+
   // Add to root
   Node *tail = (*root)->next;
   if (!tail) {
@@ -127,8 +129,15 @@ void parse_line(const char *line, Node **root, Node **target) {
 
   // Handle the last word in the dependencies (if any)
   if (buffer_index - 1 > 0) {
-    buffer[buffer_index - 1] = '\0';              // Null-terminate the word
-    add_dependency(*target, create_node(buffer)); // Add dependency
+    buffer[buffer_index - 1] = '\0'; // Null-terminate the word
+
+    Node *targets = find_target(*root, buffer);
+    if (targets) {
+      add_dependency(*target, targets);
+
+    } else {
+      add_dependency(*target, create_node(buffer)); // Add dependency
+    }
   }
 
   safe_free((void **)&buffer);
