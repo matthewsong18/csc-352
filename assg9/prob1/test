@@ -19,7 +19,7 @@ for test_file in tests/test*-make; do
 
 	  # 1: Run my program
     	
-	  ./mymake tests/outputs/"$test_name-make" $line > tests/outputs/"$test_name"-my_out 2> tests/outputs/"$test_name"-my_err
+	  ./mymake tests/"$test_name-make" $line > tests/outputs/"$test_name"-my_out 2> tests/outputs/"$test_name"-my_err
     
 		# 2: To myOut
 
@@ -27,7 +27,7 @@ for test_file in tests/test*-make; do
     
 		# 3: Run example program
     
-		./exMymake tests/outputs/"$test_name-make" $line > tests/outputs/"$test_name"-ex_out 2> tests/outputs/"$test_name"-ex_err
+		./exMymake tests/"$test_name-make" $line > tests/outputs/"$test_name"-ex_out 2> tests/outputs/"$test_name"-ex_err
     
 		# 4: To exOut
 	  echo $? >> tests/outputs/"$test_name"-ex_out
