@@ -129,11 +129,11 @@ Node *find_target(Node *root, const char *target_name) {
 
   // Search for target in dependency graph
   Node *targets = root->next;
-  while (root) {
-    if (strcmp(root->name, target_name) == 0) {
-      return root;
+  while (targets) {
+    if (strcmp(targets->name, target_name) == 0) {
+      return targets;
     }
-    root = root->next;
+    targets = targets->next;
   }
 
   // Target not found
