@@ -1,0 +1,46 @@
+#!/bin/bash
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NC='\033[0m' # No Color
+
+# make
+
+for test_file in tests/test*-make; do
+
+	# Remove directory from filename
+	test_name="${test_file#tests/}"
+
+	# Remove trailing -make
+	test_name="${test_name%-*}"
+
+	# Go through all targets in target file
+  while read -r line; do
+
+	  # 1: Run my program
+    	
+	  ./mymake "$test_name-make" $line > tests/outputs/"$test_name"-my_out 2> tests/outputs/"$test_name"-my_err
+    
+		# 2: To myOut
+
+	  echo $? >> tests/outputs/"$test_name"-my_out
+    
+		# 3: Run example program
+    
+		./exMymake "$test_file-make" $line > tests/outputs/"$test_name"-ex_out 2> tests/outputs/"$test_name"-ex_err
+    
+		# 4: To exOut
+	  echo $? >> tests/outputs/"$test_name"-ex_out
+
+	  # 5: Print test results
+		printf -- "--------------------------------------------------------------------------------\n"
+	  printf "${RED}Test File:${NC} $test_name ${RED}Target:${NC} $line\n\n"
+	  printf "${GREEN}stdout diffs:${NC} $(diff tests/outputs/"$test_name"-ex_out tests/outputs/"$test_name"-my_out)\n\n"
+	  printf "${GREEN}stderr diffs:${NC} $(diff tests/outputs/"$test_name"-ex_err tests/outputs/"$test_name"-my_err)\n"
+		printf -- "--------------------------------------------------------------------------------\n"
+		printf "\n"
+
+  done < tests/"$test_name-targets"
+
+done
+
