@@ -92,7 +92,6 @@ void add_command(Node *node, const char *command) {
 void free_graph(Node *root) {
   if (!root)
     return;
-
   free_commands(root->commands);
   free_graph(root->dependencies);
   free_graph(root->next);

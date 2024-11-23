@@ -104,8 +104,6 @@ void parse_line(const char *line, Node **root, Node **target) {
         buffer[buffer_index] = '\0';                  // Null-terminate the word
         add_dependency(*target, create_node(buffer)); // Add dependency
         buffer_index = 0; // Reset buffer for the next word
-        safe_free((void **)&buffer);
-        buffer = safe_malloc(65);
       }
     } else if (buffer_index < 64) {
       buffer[buffer_index++] = *ptr; // Append character to buffer

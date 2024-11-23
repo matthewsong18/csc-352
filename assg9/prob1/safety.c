@@ -33,17 +33,27 @@ void *safe_strdup(const char *string) {
 
 // Free allocated memory
 void safe_free(void **ptr) {
-  if (*ptr) {
+  if (ptr && *ptr) {
     allocation_count--;
     free(*ptr);
-    *ptr = NULL;
-    ptr = NULL;
+    *ptr = NULL; // Nullify the pointer in the caller's scope
+  } else {
+    fprintf(stdout, "Warning: Attempt to free null or already freed memory\n");
   }
 }
 
+// Check for memory leaks
 void check_for_leaks() {
   if (allocation_count != 0) {
-    fprintf(stderr, "Memory leak detected: %d allocations not freed\n",
+    fprintf(stdout, "Memory leak detected: %d allocations not freed\n",
             allocation_count);
+  } else {
+    printf("No memory leaks detected.\n");
   }
 }
+
+// Get allocation count
+int check_allocation_count() { return allocation_count; }
+
+// Reset allocation count (for testing purposes)
+void reset_allocation_count() { allocation_count = 0; }
