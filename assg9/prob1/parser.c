@@ -105,6 +105,14 @@ void parse_line(const char *line, Node **root, Node **target) {
         Node *targets = find_target(*root, buffer);
         if (targets) {
           add_dependency(*target, targets);
+          Node *depends = (*root)->next;
+          while (depends) {
+            if (depends->next == targets) {
+              depends->next = targets->next;
+              targets->next = NULL;
+            }
+            depends = depends->next;
+          }
         } else {
           add_dependency(*target, create_node(buffer)); // Add dependency
         }
