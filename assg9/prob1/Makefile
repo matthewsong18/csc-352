@@ -27,10 +27,10 @@ test_parser: parser.c parser.h test_parser.c safety.c safety.h graph.c graph.h
 	$(CC) $(CFLAGS) -o test_parser parser.c test_parser.c safety.c graph.c
 
 # Run tests
-test: test_safety test_graph 
+test: test_safety test_graph test_parser
 	./test_safety
 	./test_graph
-	# ./test_parser
+	./test_parser
 
 clean:
 	rm -rf mymake test_safety test_graph test_parser test_graph_output.txt*.o *.dSYM
