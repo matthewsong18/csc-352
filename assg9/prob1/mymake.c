@@ -1,4 +1,5 @@
 #include "mymake.h"
+#include "safety.h"
 
 int main(int argc, char **argv) {
   int errorStatus = STATUS_OKAY;
@@ -29,6 +30,7 @@ int main(int argc, char **argv) {
 
   // Free allocated memory
   free_graph(root->next);
+  safe_free((void **)&target);
   free_graph(root);
 
   return errorStatus;
