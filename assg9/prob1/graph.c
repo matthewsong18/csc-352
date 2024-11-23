@@ -235,7 +235,7 @@ void process_node(Node *node) {
 
   Command *commands = node->commands;
   while (commands) {
-    printf("\t%s\n", commands->command);
+    printf("  %s\n", commands->command);
     commands = commands->next;
   }
 }
