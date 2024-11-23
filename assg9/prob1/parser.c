@@ -101,8 +101,14 @@ void parse_line(const char *line, Node **root, Node **target) {
   while (*ptr) {
     if (*ptr == ' ') { // Space indicates the end of a dependency word
       if (buffer_index > 0) {
-        buffer[buffer_index] = '\0';                  // Null-terminate the word
-        add_dependency(*target, create_node(buffer)); // Add dependency
+        buffer[buffer_index] = '\0'; // Null-terminate the word
+        Node *targets = find_target(*root, buffer);
+        if (targets) {
+          add_dependency(*target, targets);
+        } else {
+          add_dependency(*target, create_node(buffer)); // Add dependency
+        }
+        targets = NULL;
         buffer_index = 0; // Reset buffer for the next word
       }
     } else if (buffer_index < 64) {
