@@ -1,4 +1,5 @@
 #include "graph.h"
+#include "safety.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -126,6 +127,9 @@ int test_postorder_traversal() {
 
   printf("Actual output:\n");
   postorder_traversal(root);
+  free_graph(root);
+
+  check_for_leaks();
 
   return 1;
 }
