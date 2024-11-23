@@ -27,7 +27,7 @@ for test_file in tests/test*-make; do
     
 		# 3: Run example program
     
-		./exMymake "$test_file-make" $line > tests/outputs/"$test_name"-ex_out 2> tests/outputs/"$test_name"-ex_err
+		./exMymake "$test_name-make" $line > tests/outputs/"$test_name"-ex_out 2> tests/outputs/"$test_name"-ex_err
     
 		# 4: To exOut
 	  echo $? >> tests/outputs/"$test_name"-ex_out
