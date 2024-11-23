@@ -75,20 +75,18 @@ void parse_line(const char *line, Node **root, Node **target) {
   }
 
   // Handle target not found
-  if (!*target) {
-    *target = create_node(target_name);
+  *target = create_node(target_name);
 
-    // Add to root
-    Node *tail = (*root)->next;
-    if (!tail) {
-      (*root)->next = *target;
-    } else {
-      while (tail->next) {
-        tail = tail->next;
-      }
-
-      tail->next = *target;
+  // Add to root
+  Node *tail = (*root)->next;
+  if (!tail) {
+    (*root)->next = *target;
+  } else {
+    while (tail->next) {
+      tail = tail->next;
     }
+
+    tail->next = *target;
   }
 
   const char *dependencies = colon + 1;
@@ -103,39 +101,39 @@ void parse_line(const char *line, Node **root, Node **target) {
   while (*ptr) {
     if (*ptr == ' ') { // Space indicates the end of a dependency word
       if (buffer_index > 0) {
-        buffer[buffer_index] = '\0'; // Null-terminate the word
-        printf("%s\n", buffer);
+        buffer[buffer_index] = '\0';                  // Null-terminate the word
         add_dependency(*target, create_node(buffer)); // Add dependency
         buffer_index = 0; // Reset buffer for the next word
         safe_free((void **)&buffer);
         buffer = safe_malloc(65);
       }
-    } else if (buffer_index < sizeof(buffer) - 1) {
+    } else if (buffer_index < 64) {
       buffer[buffer_index++] = *ptr; // Append character to buffer
     }
     ptr++; // Move to the next character
   }
 
   // Handle the last word in the dependencies (if any)
-  if (buffer_index > 0) {
-    buffer[buffer_index] = '\0';                  // Null-terminate the word
+  if (buffer_index - 1 > 0) {
+    buffer[buffer_index - 1] = '\0';              // Null-terminate the word
     add_dependency(*target, create_node(buffer)); // Add dependency
   }
 
   safe_free((void **)&buffer);
 }
 
-Node *find_target(Node *node, const char *target_name) {
-  if (!node) {
+Node *find_target(Node *root, const char *target_name) {
+  if (!root) {
     handle_error("ERROR: NULL root passed into find_target()");
   }
 
   // Search for target in dependency graph
-  while (node) {
-    if (strcmp(node->name, target_name) == 0) {
-      return node;
+  Node *targets = root->next;
+  while (root) {
+    if (strcmp(root->name, target_name) == 0) {
+      return root;
     }
-    node = node->dependencies;
+    root = root->next;
   }
 
   // Target not found

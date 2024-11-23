@@ -105,7 +105,7 @@ int test_parse_example_makefile() {
   Node *depend = target->dependencies;
   while (depend) {
     count++;
-    printf("%64s\n", depend->name);
+    printf("%s\n", depend->name);
     depend = depend->dependencies;
   }
 
@@ -117,18 +117,21 @@ int test_parse_example_makefile() {
 
   // Check if dependencies are correct
   if (strcmp(target->dependencies->name, "utils.h") != 0) {
-    printf("Error: spellcheck.o dependencies are incorrect.\n");
+    printf("Error: spellcheck.o doesn't have utils.h\n");
     free_graph(graph);
     return 0;
   }
+  target = target->dependencies;
 
   if (strcmp(target->dependencies->name, "spellcheck.h") != 0) {
-    printf("Error: spellcheck.o dependencies are incorrect.\n");
+    printf("Error: spellcheck.o doesn't have spellcheck.h\n");
     free_graph(graph);
     return 0;
   }
+  target = target->dependencies;
+
   if (strcmp(target->dependencies->name, "spellcheck.c") != 0) {
-    printf("Error: spellcheck.o dependencies are incorrect.\n");
+    printf("Error: spellcheck.o doesn't have spellcheck.c\n");
     free_graph(graph);
     return 0;
   }
