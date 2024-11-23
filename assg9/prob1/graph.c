@@ -136,7 +136,7 @@ void process_node(Node *node) {
 
   Command *commands = node->commands;
   while (commands) {
-    printf("    %s", commands->command);
+    printf("  %s", commands->command);
     commands = commands->next;
   }
   return;
