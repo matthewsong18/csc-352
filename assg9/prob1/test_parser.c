@@ -85,18 +85,29 @@ int test_parse_example_makefile() {
     return 0;
   }
 
-  printf("MADE IT HERE\n");
-
   // Validate the structure of the graph
-  Node *target = find_target(graph, "spellcheck.o");
+  Node *targets = graph->next;
+  Node *target = NULL;
+  while (targets) {
+    if (strcmp("spellcheck.o", targets->name) == 0) {
+      target = targets;
+      break;
+    }
+    targets = targets->next;
+  }
+
+  if (!target) {
+    printf("ERROR: target is NULL\n");
+    return 0;
+  }
+
   int count = 0;
   Node *depend = target->dependencies;
   while (depend) {
     count++;
+    printf("%64s\n", depend->name);
     depend = depend->dependencies;
   }
-
-  printf("MADE IT HERE\n");
 
   if (!target || count != 3) {
     printf("Error: spellcheck.o node has incorrect dependencies.\n");
