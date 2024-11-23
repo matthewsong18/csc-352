@@ -1,17 +1,47 @@
+/*
+ * File: safety.c
+ * Author: Matthew
+ * Purpose: Provides safe memory management utilities and error handling for the
+ * program. Includes wrappers for common memory operations, a memory leak
+ * checker, and error-handling functions.
+ */
+
 #include "safety.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-int allocation_count = 0;
+int allocation_count = 0; // Tracks the number of active memory allocations
 
-// Handle errors and exit the program
+/*
+ * handle_error(message) -- Prints an error message and exits the program.
+ *
+ * Arguments:
+ *    message - The error message to display (must not be NULL).
+ *
+ * Behavior:
+ *    - Prints the error message to stderr using perror().
+ *    - Exits the program with status 1.
+ */
 void handle_error(const char *message) {
   perror(message);
   exit(1);
 }
 
-// Safe malloc wrapper
+/*
+ * safe_malloc(size) -- Allocates memory and checks for allocation errors.
+ *
+ * Arguments:
+ *    size - The size of memory to allocate (in bytes).
+ *
+ * Returns:
+ *    A pointer to the allocated memory.
+ *
+ * Behavior:
+ *    - Uses malloc to allocate memory.
+ *    - If allocation fails, calls handle_error() to terminate the program.
+ *    - Increments the allocation count for leak tracking.
+ */
 void *safe_malloc(size_t size) {
   void *ptr = malloc(size);
   if (!ptr) {
@@ -21,7 +51,20 @@ void *safe_malloc(size_t size) {
   return ptr;
 }
 
-// Safe strdup wrapper
+/*
+ * safe_strdup(string) -- Duplicates a string and checks for allocation errors.
+ *
+ * Arguments:
+ *    string - The string to duplicate (must not be NULL).
+ *
+ * Returns:
+ *    A pointer to the duplicated string.
+ *
+ * Behavior:
+ *    - Uses strdup to duplicate the string.
+ *    - If duplication fails, calls handle_error() to terminate the program.
+ *    - Increments the allocation count for leak tracking.
+ */
 void *safe_strdup(const char *string) {
   void *ptr = strdup(string);
   if (!ptr) {
@@ -31,7 +74,18 @@ void *safe_strdup(const char *string) {
   return ptr;
 }
 
-// Free allocated memory
+/*
+ * safe_free(ptr) -- Frees allocated memory and nullifies the pointer.
+ *
+ * Arguments:
+ *    ptr - A double pointer to the memory to free (must not be NULL).
+ *
+ * Behavior:
+ *    - Frees the memory pointed to by *ptr.
+ *    - Sets *ptr to NULL to avoid dangling pointers.
+ *    - Decrements the allocation count for leak tracking.
+ *    - Prints a warning if called with a NULL or already freed pointer.
+ */
 void safe_free(void **ptr) {
   if (ptr && *ptr) {
     allocation_count--;
@@ -42,7 +96,14 @@ void safe_free(void **ptr) {
   }
 }
 
-// Check for memory leaks
+/*
+ * check_for_leaks() -- Checks if there are any memory leaks.
+ *
+ * Behavior:
+ *    - Prints the number of allocations not freed if any memory leaks are
+ * detected.
+ *    - Prints a message confirming no leaks if all memory is properly freed.
+ */
 void check_for_leaks() {
   if (allocation_count != 0) {
     fprintf(stdout, "Memory leak detected: %d allocations not freed\n",
@@ -52,8 +113,19 @@ void check_for_leaks() {
   }
 }
 
-// Get allocation count
+/*
+ * check_allocation_count() -- Returns the current number of active allocations.
+ *
+ * Returns:
+ *    The number of active allocations.
+ */
 int check_allocation_count() { return allocation_count; }
 
-// Reset allocation count (for testing purposes)
+/*
+ * reset_allocation_count() -- Resets the allocation count to zero.
+ *
+ * Behavior:
+ *    - Sets the allocation_count variable to 0.
+ *    - Intended for use in testing scenarios where allocations are simulated.
+ */
 void reset_allocation_count() { allocation_count = 0; }

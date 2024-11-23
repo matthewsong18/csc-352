@@ -1,6 +1,39 @@
+/*
+ * File: mymake.c
+ * Author: Matthew
+ * Purpose: Implements a simple dependency resolver for makefiles. The program
+ *          parses a makefile, builds a dependency graph, and performs a
+ *          postorder traversal on the specified target.
+ */
+
 #include "mymake.h"
 #include "safety.h"
 
+/*
+ * main(argc, argv) -- Entry point for the program.
+ *
+ * Arguments:
+ *    argc - The number of command-line arguments.
+ *    argv - An array of command-line arguments, where:
+ *           argv[0] is the program name,
+ *           argv[1] is the path to the makefile,
+ *           argv[2] is the target to resolve.
+ *
+ * Returns:
+ *    STATUS_OKAY (0) on success.
+ *    Exits with status 1 on error.
+ *
+ * Assumptions:
+ *    The program expects exactly two arguments after the program name:
+ *    a makefile path and a target name.
+ *
+ * Behavior:
+ *    1. Validates the command-line arguments.
+ *    2. Parses the makefile and builds a dependency graph.
+ *    3. Locates the specified target within the graph.
+ *    4. Performs a postorder traversal starting from the target.
+ *    5. Frees all allocated memory before exiting.
+ */
 int main(int argc, char **argv) {
   int errorStatus = STATUS_OKAY;
 

@@ -1,3 +1,10 @@
+/*
+ * File: parser.c
+ * Author: Matthew
+ * Purpose: Provides functionality to parse a makefile, build a dependency
+ * graph, and locate targets within the graph.
+ */
+
 #include "parser.h"
 #include "graph.h"
 #include "safety.h"
@@ -5,11 +12,27 @@
 #include <stdlib.h>
 #include <string.h>
 
+/*
+ * parse_makefile(filename) -- Parses a makefile and builds a dependency graph.
+ *
+ * Arguments:
+ *    filename - The path to the makefile (must not be NULL).
+ *
+ * Returns:
+ *    A pointer to the root node of the dependency graph.
+ *
+ * Assumptions:
+ *    - The makefile exists and is readable.
+ *
+ * Behavior:
+ *    - Reads the makefile line by line and constructs the dependency graph.
+ *    - Calls parse_line() to process each line.
+ *    - Frees dynamically allocated memory for lines.
+ *    - Exits with an error if the file cannot be opened or read.
+ */
 Node *parse_makefile(const char *filename) {
-  // Get file
   FILE *file = fopen(filename, "r");
 
-  // Handle NULL file
   if (!file) {
     handle_error("ERROR: Failed to read file\n");
   }
@@ -17,7 +40,6 @@ Node *parse_makefile(const char *filename) {
   Node *root = NULL;
   Node *target = NULL;
 
-  // Parsing the makefile
   char *line = NULL;
   size_t line_cap = 0;
 
@@ -27,25 +49,35 @@ Node *parse_makefile(const char *filename) {
   }
 
   safe_free((void **)&line);
-  safe_free((void **)&target);
   fclose(file);
   return root;
 }
 
+/*
+ * parse_line(line, root, target) -- Parses a single line of the makefile.
+ *
+ * Arguments:
+ *    line - The line to parse (must not be NULL).
+ *    root - Pointer to the root of the dependency graph (updated if NULL).
+ *    target - Pointer to the current target node (updated based on the line).
+ *
+ * Behavior:
+ *    - If the line starts with a tab, it adds a command to the current target.
+ *    - If the line contains a colon, it defines a target and its dependencies.
+ *    - Dynamically allocates memory for target names and buffers.
+ *    - Frees temporary buffers after use.
+ */
 void parse_line(const char *line, Node **root, Node **target) {
   if (!line) {
     handle_error("ERROR: NULL line passed to parse_line()\n");
   }
 
-  // Check if the line starts with a tab
   if (line[0] == '\t') {
-    // Add the command to the target node
-    const char *command = line + 1; // Skip the tab
+    const char *command = line + 1;
     while (*command == ' ') {
-      command++; // Skip leading spaces
+      command++;
     }
 
-    // Handle NULL target
     if (*target) {
       add_command(*target, command);
     } else {
@@ -55,13 +87,10 @@ void parse_line(const char *line, Node **root, Node **target) {
   }
 
   const char *colon = strchr(line, ':');
-
-  // Handle bad format line
   if (!colon) {
     handle_error("ERROR: makeFile missing colon\n");
   }
 
-  // Pull target name from line
   size_t target_len = colon - line;
   while (line[target_len - 1] == ' ') {
     target_len--;
@@ -70,17 +99,13 @@ void parse_line(const char *line, Node **root, Node **target) {
   strncpy(target_name, line, target_len);
   target_name[target_len] = '\0';
 
-  // Handle empty root
   if (!*root) {
     *root = create_node("root");
   }
 
-  // Handle target not found
   *target = create_node(target_name);
-
   safe_free((void **)&target_name);
 
-  // Add to root
   Node *tail = (*root)->next;
   if (!tail) {
     (*root)->next = *target;
@@ -88,7 +113,6 @@ void parse_line(const char *line, Node **root, Node **target) {
     while (tail->next) {
       tail = tail->next;
     }
-
     tail->next = *target;
   }
 
@@ -99,57 +123,60 @@ void parse_line(const char *line, Node **root, Node **target) {
 
   char *buffer = safe_malloc(65);
   size_t buffer_index = 0;
+  const char *ptr = dependencies;
 
-  const char *ptr = dependencies; // Pointer to current position in dependencies
   while (*ptr) {
-    if (*ptr == ' ') { // Space indicates the end of a dependency word
+    if (*ptr == ' ') {
       if (buffer_index > 0) {
-        buffer[buffer_index] = '\0'; // Null-terminate the word
+        buffer[buffer_index] = '\0';
         Node *targets = find_target(*root, buffer);
         if (targets) {
           add_dependency(*target, targets);
-          // Node *depends = (*root)->next;
-          // while (depends) {
-          //   if (depends->next == targets) {
-          //     depends->next = targets->next;
-          //     targets->next = NULL;
-          //   }
-          //   depends = depends->next;
-          // }
         } else {
-          add_dependency(*target, create_node(buffer)); // Add dependency
+          add_dependency(*target, create_node(buffer));
         }
-        targets = NULL;
-        buffer_index = 0; // Reset buffer for the next word
+        buffer_index = 0;
       }
     } else if (buffer_index < 64) {
-      buffer[buffer_index++] = *ptr; // Append character to buffer
+      buffer[buffer_index++] = *ptr;
     }
-    ptr++; // Move to the next character
+    ptr++;
   }
 
-  // Handle the last word in the dependencies (if any)
-  if (buffer_index - 1 > 0) {
-    buffer[buffer_index - 1] = '\0'; // Null-terminate the word
-
+  if (buffer_index > 0) {
+    buffer[buffer_index] = '\0';
     Node *targets = find_target(*root, buffer);
     if (targets) {
       add_dependency(*target, targets);
-
     } else {
-      add_dependency(*target, create_node(buffer)); // Add dependency
+      add_dependency(*target, create_node(buffer));
     }
   }
 
   safe_free((void **)&buffer);
 }
 
+/*
+ * find_target(root, target_name) -- Finds a target node by name in the graph.
+ *
+ * Arguments:
+ *    root - The root node of the dependency graph (must not be NULL).
+ *    target_name - The name of the target to find (must not be NULL).
+ *
+ * Returns:
+ *    A pointer to the target node if found, or NULL if not found.
+ *
+ * Assumptions:
+ *    - The graph is properly constructed.
+ *
+ * Behavior:
+ *    - Traverses the linked list of nodes to locate the target.
+ */
 Node *find_target(Node *root, const char *target_name) {
   if (!root) {
     handle_error("ERROR: NULL root passed into find_target()");
   }
 
-  // Search for target in dependency graph
   Node *targets = root->next;
   while (targets) {
     if (strcmp(targets->name, target_name) == 0) {
@@ -158,6 +185,5 @@ Node *find_target(Node *root, const char *target_name) {
     targets = targets->next;
   }
 
-  // Target not found
   return NULL;
 }
