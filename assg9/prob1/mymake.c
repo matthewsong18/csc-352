@@ -29,7 +29,6 @@ int main(int argc, char **argv) {
   postorder_traversal(target);
 
   // Free allocated memory
-  free_graph(root->next);
   free_graph(root);
 
   return errorStatus;

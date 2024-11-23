@@ -16,6 +16,7 @@ Node *create_node(const char *name) {
   node->dependencies = NULL;
   node->visited = 0;
   node->next = NULL;
+  node->freed = 0;
   return node;
 }
 
@@ -92,20 +93,39 @@ void add_command(Node *node, const char *command) {
 void free_graph(Node *root) {
   if (!root)
     return;
+
+  if (root->freed)
+    return;
+
+  root->freed = 1;
+
+  // Free dependencies as a linked list
+  Node *current_dep = root->dependencies;
+  while (current_dep) {
+    Node *next_dep = current_dep->next; // Save next node
+    free_graph(current_dep); // Recursively free the current dependency
+    current_dep = next_dep;  // Move to the next dependency
+  }
+
+  // Free commands
   free_commands(root->commands);
-  free_graph(root->dependencies);
-  // free_graph(root->next);
+
+  // Free the next node in the list
+  free_graph(root->next);
+
+  // Free the current node's name and the node itself
   safe_free((void **)&(root->name));
   safe_free((void **)&root);
 }
 
+// Free the command list
 void free_commands(Command *root) {
-  if (!root)
-    return;
-
-  free_commands(root->next);
-  safe_free((void **)&(root->command));
-  safe_free((void **)&root);
+  while (root) {
+    Command *next = root->next;           // Save next command
+    safe_free((void **)&(root->command)); // Free command string
+    safe_free((void **)&root);            // Free command node
+    root = next;                          // Move to the next command
+  }
 }
 
 // Postorder traversal

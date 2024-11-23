@@ -27,6 +27,7 @@ Node *parse_makefile(const char *filename) {
   }
 
   safe_free((void **)&line);
+  safe_free((void **)&target);
   fclose(file);
   return root;
 }

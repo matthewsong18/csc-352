@@ -10,6 +10,7 @@ typedef struct Node {
   struct Node *dependencies; // Linked list of pointers to dependency nodes
   int visited;               // For tracking during traversal
   struct Node *next;         // The next target in the graph
+  int freed;
 } Node;
 
 // Command node for the command linked list
