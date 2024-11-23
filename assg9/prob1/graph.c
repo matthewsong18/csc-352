@@ -94,7 +94,7 @@ void free_graph(Node *root) {
     return;
   free_commands(root->commands);
   free_graph(root->dependencies);
-  free_graph(root->next);
+  // free_graph(root->next);
   safe_free((void **)&(root->name));
   safe_free((void **)&root);
 }

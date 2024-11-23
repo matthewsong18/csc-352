@@ -95,7 +95,7 @@ int test_parse_example_makefile() {
   Node *targets = graph->next;
   Node *target = NULL;
   while (targets) {
-    if (strcmp("spellcheck.o", targets->name) == 0) {
+    if (strcmp("hash.o", targets->name) == 0) {
       target = targets;
       break;
     }
@@ -115,33 +115,39 @@ int test_parse_example_makefile() {
     depend = depend->dependencies;
   }
 
-  if (!target || count != 3) {
+  if (!target || count != 4) {
     printf("Error: spellcheck.o node has incorrect dependencies.\n");
     free_graph(graph);
     return 0;
   }
 
   // Check if dependencies are correct
+  if (strcmp(target->dependencies->name, "hash.c") != 0) {
+    printf("Error: hash.o doesn't have hash.c\n");
+    free_graph(graph);
+    return 0;
+  }
+  target = target->dependencies;
+
   if (strcmp(target->dependencies->name, "utils.h") != 0) {
-    printf("Error: spellcheck.o doesn't have utils.h\n");
+    printf("Error: hash.o doesn't have utils.h\n");
     free_graph(graph);
     return 0;
   }
   target = target->dependencies;
 
-  if (strcmp(target->dependencies->name, "spellcheck.h") != 0) {
-    printf("Error: spellcheck.o doesn't have spellcheck.h\n");
+  if (strcmp(target->dependencies->name, "hash.h") != 0) {
+    printf("Error: hash.o doesn't have hash.h\n");
     free_graph(graph);
     return 0;
   }
   target = target->dependencies;
 
-  if (strcmp(target->dependencies->name, "spellcheck.c") != 0) {
-    printf("Error: spellcheck.o doesn't have spellcheck.c\n");
+  if (strcmp(target->dependencies->name, "spellcheck.o") != 0) {
+    printf("Error: hash.o doesn't have spellcheck.o\n");
     free_graph(graph);
     return 0;
   }
-
   free_graph(graph);
 
   check_for_leaks();
