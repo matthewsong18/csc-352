@@ -27,7 +27,6 @@ Node *parse_makefile(const char *filename) {
   }
 
   safe_free((void **)&line);
-  safe_free((void **)&target);
   fclose(file);
   return root;
 }
@@ -75,8 +74,6 @@ void parse_line(const char *line, Node **root, Node **target) {
     *root = create_node("root");
   }
 
-  *target = find_target(*root, target_name);
-
   // Handle target not found
   if (!*target) {
     *target = create_node(target_name);
@@ -102,21 +99,29 @@ void parse_line(const char *line, Node **root, Node **target) {
   char *buffer = safe_malloc(65);
   size_t buffer_index = 0;
 
-  for (const char *ptr = dependencies;; ptr++) {
-    if (*ptr == ' ' || *ptr == '\0') {
-      // End of a dependency word
+  const char *ptr = dependencies; // Pointer to current position in dependencies
+  while (*ptr) {
+    if (*ptr == ' ') { // Space indicates the end of a dependency word
       if (buffer_index > 0) {
-        buffer[buffer_index] = '\0';                  // Null-terminate the word
+        buffer[buffer_index] = '\0'; // Null-terminate the word
+        printf("%s\n", buffer);
         add_dependency(*target, create_node(buffer)); // Add dependency
-        buffer_index = 0;                             // Reset buffer
+        buffer_index = 0; // Reset buffer for the next word
+        safe_free((void **)&buffer);
+        buffer = safe_malloc(65);
       }
-      if (*ptr == '\0')
-        break; // End of dependencies
     } else if (buffer_index < sizeof(buffer) - 1) {
-      // Append character to buffer if there's space
-      buffer[buffer_index++] = *ptr;
+      buffer[buffer_index++] = *ptr; // Append character to buffer
     }
+    ptr++; // Move to the next character
   }
+
+  // Handle the last word in the dependencies (if any)
+  if (buffer_index > 0) {
+    buffer[buffer_index] = '\0';                  // Null-terminate the word
+    add_dependency(*target, create_node(buffer)); // Add dependency
+  }
+
   safe_free((void **)&buffer);
 }
 
