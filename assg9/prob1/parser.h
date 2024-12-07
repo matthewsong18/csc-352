@@ -2,11 +2,14 @@
 #define PARSER_H
 
 #include "graph.h"
-#include "safety.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 // Function prototypes
-Node *parse_makefile(const char *filename);
-void parse_line(const char *line, Node **root, Node **target);
-Node *find_target(Node *root, const char *target_name);
+Node *make_dependency_tree(char *make_file_path);
+void parse_lines(FILE *make_file, Node **root);
+void parse_line(char *line, Node **root);
+int is_command(char *line);
 
 #endif // PARSER_H

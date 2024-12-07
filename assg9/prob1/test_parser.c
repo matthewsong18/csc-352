@@ -1,188 +1,89 @@
 #include "graph.h"
 #include "parser.h"
 #include "safety.h"
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 
 // Function prototypes for individual tests
 int test_parse_line();
-int test_parse_example_makefile();
-int test_find_target_in_example();
+int test_parse_lines();
+int test_make_dependency_tree();
 
 void run_test(const char *test_name, int (*test_func)()) {
   printf("Running %s...\n", test_name);
-  int result = test_func();
-  if (result) {
-    printf("Result: %s passed!\n\n", test_name);
-  } else {
-    printf("Result: %s failed.\n\n", test_name);
-  }
+  test_func();
+  printf("Result: %s passed!\n\n", test_name);
 }
 
 int main() {
-  int total_tests = 3, passed_tests = 0;
+  printf("\033[33m\nStarting Tests...\033[0m\n\n");
 
-  printf("Starting Tests...\n");
-  if (test_parse_line())
-    passed_tests++;
-  if (test_parse_example_makefile())
-    passed_tests++;
-  if (test_find_target_in_example())
-    passed_tests++;
+  run_test("test_parse_line", test_parse_line);
+  run_test("test_parse_lines", test_parse_lines);
+  run_test("make_dependency_tree", test_make_dependency_tree);
 
-  printf("Test Summary: %d/%d tests passed.\n", passed_tests, total_tests);
-  return (total_tests == passed_tests)
-             ? 0
-             : 1; // Exit with failure if not all tests pass
+  printf("\033[32mAll Tests Passed\033[0m\n\n");
+
+  return 0;
 }
-
-// Test Cases Implementation
 
 int test_parse_line() {
-  printf("Testing parse line\n");
-
+  char *target_line = "target5 : dep1 dep2 dep3";
+  char *input = safe_strdup(target_line);
   Node *root = NULL;
-  Node *target = NULL;
-  char *line = "spellcheck.o : utils.h spellcheck.h spellcheck.c";
-  parse_line(line, &root, &target);
-  if (!root) {
-    printf("ERROR: Root is NULL\n");
-    safe_free((void **)&target);
-    return 0;
-  }
 
-  if (!target) {
-    printf("ERROR: Target is NULL\n");
-    free_graph(root);
-    return 0;
-  }
+  parse_line(input, &root);
+  assert(root != NULL);
+  assert(root->target != NULL);
+  assert(strcmp("target5", root->target) == 0);
+  Node *dep = root->dependency;
+  assert(strcmp("dep1", dep->target) == 0);
+  dep = dep->next_dep;
+  assert(strcmp("dep2", dep->target) == 0);
+  dep = dep->next_dep;
+  assert(strcmp("dep3", dep->target) == 0);
 
-  if (strcmp(root->next->name, "spellcheck.o") != 0) {
-    printf("ERROR: root target list was not correct\n");
-    printf("%s\n", root->next->name);
-    free_graph(root);
-    safe_free((void **)&target);
-    return 0;
-  }
+  char *t2 = "testStuff:";
+  char *input2 = safe_strdup(t2);
+  Node *root2 = NULL;
 
-  if (strcmp(target->name, "spellcheck.o") != 0) {
-    printf("ERROR: target was not correct\n");
-    printf("%s\n", target->name);
-    free_graph(root);
-    safe_free((void **)&target);
-    return 0;
-  }
+  parse_line(input2, &root2);
+  assert(root2 != NULL);
+  assert(root2->target != NULL);
+  assert(strcmp("testStuff", root2->target) == 0);
+  Node *dep2 = root2->dependency;
+  assert(dep2 == NULL);
+  return 1;
+}
 
-  free_graph(root);
+int test_parse_lines() {
+  FILE *file = fopen("tests/test_example-make", "r");
+  Node *root = NULL;
+  parse_lines(file, &root);
 
-  check_for_leaks();
+  assert(root != NULL);
+  assert(root->target != NULL);
+  assert(strcmp("spellcheck", root->target) == 0);
+  Node *dep = root->dependency;
+  assert(strcmp("hash.o", dep->target) == 0);
+  dep = dep->next_dep;
+  assert(strcmp("spellcheck.o", dep->target) == 0);
 
   return 1;
 }
 
-int test_parse_example_makefile() {
-  printf("Testing parsing example makefile...\n");
+int test_make_dependency_tree() {
+  char *path = "tests/test_example-make";
 
-  // Parse the example makefile
-  const char *example_makefile = "tests/test_example-make";
-  Node *graph = parse_makefile(example_makefile);
-  if (!graph) {
-    printf("Error: Failed to parse example makefile.\n");
-    return 0;
-  }
+  Node *root = make_dependency_tree(path);
+  assert(root != NULL);
+  assert(root->target != NULL);
+  assert(strcmp("spellcheck", root->target) == 0);
+  Node *dep = root->dependency;
+  assert(strcmp("hash.o", dep->target) == 0);
+  dep = dep->next_dep;
+  assert(strcmp("spellcheck.o", dep->target) == 0);
 
-  // Validate the structure of the graph
-  Node *targets = graph->next;
-  Node *target = NULL;
-  while (targets) {
-    if (strcmp("hash.o", targets->name) == 0) {
-      target = targets;
-      break;
-    }
-    targets = targets->next;
-  }
-
-  if (!target) {
-    printf("ERROR: target is NULL\n");
-    return 0;
-  }
-
-  int count = 0;
-  Node *depend = target->dependencies;
-  while (depend) {
-    count++;
-    printf("%s\n", depend->name);
-    depend = depend->dependencies;
-  }
-
-  if (!target || count != 4) {
-    printf("Error: spellcheck.o node has incorrect dependencies.\n");
-    free_graph(graph);
-    return 0;
-  }
-
-  // Check if dependencies are correct
-  if (strcmp(target->dependencies->name, "hash.c") != 0) {
-    printf("Error: hash.o doesn't have hash.c\n");
-    free_graph(graph);
-    return 0;
-  }
-  target = target->dependencies;
-
-  if (strcmp(target->dependencies->name, "utils.h") != 0) {
-    printf("Error: hash.o doesn't have utils.h\n");
-    free_graph(graph);
-    return 0;
-  }
-  target = target->dependencies;
-
-  if (strcmp(target->dependencies->name, "hash.h") != 0) {
-    printf("Error: hash.o doesn't have hash.h\n");
-    free_graph(graph);
-    return 0;
-  }
-  target = target->dependencies;
-
-  if (strcmp(target->dependencies->name, "spellcheck.o") != 0) {
-    printf("Error: hash.o doesn't have spellcheck.o\n");
-    free_graph(graph);
-    return 0;
-  }
-  free_graph(graph);
-
-  check_for_leaks();
-  return 1;
-}
-
-int test_find_target_in_example() {
-  printf("Testing finding targets in example makefile...\n");
-
-  // Parse the example makefile
-  const char *example_makefile = "tests/test_example-make";
-  Node *graph = parse_makefile(example_makefile);
-  if (!graph) {
-    printf("Error: Failed to parse example makefile.\n");
-    return 0;
-  }
-
-  // Validate specific targets
-  Node *spellcheck = find_target(graph, "spellcheck");
-  Node *testStuff = find_target(graph, "testStuff");
-
-  if (!spellcheck || strcmp(spellcheck->name, "spellcheck") != 0) {
-    printf("Error: spellcheck target not found or incorrect.\n");
-    free_graph(graph);
-    return 0;
-  }
-
-  if (!testStuff || strcmp(testStuff->name, "testStuff") != 0) {
-    printf("Error: testStuff target not found or incorrect.\n");
-    free_graph(graph);
-    return 0;
-  }
-
-  free_graph(graph);
-
-  check_for_leaks();
   return 1;
 }
