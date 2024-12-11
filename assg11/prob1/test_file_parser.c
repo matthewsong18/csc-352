@@ -11,7 +11,7 @@ int test_blank_line() {
   assert(is_blank_line(null_line) == 1);
   assert(is_blank_line(empty_line) == 1);
   assert(is_blank_line(white_space_line) == 1);
-  assert(is_blank_line(non_empty_line));
+  assert(is_blank_line(non_empty_line) == 0);
 
   return 0;
 }
