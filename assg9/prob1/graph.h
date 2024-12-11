@@ -42,8 +42,14 @@ void add_dependency(Node *target, Node *dependency);
 int has_no_dependency(Node *target, Node *dependency);
 void add_dependency_at_end_of_list(Node *target, Node *dependency);
 void update_tree(Node **root_addr);
+void search_for_all_targets(Node *search_target, Node *root);
+Node *search_every_target(Node *search_target, Node *targets);
 Node *find_node(Node *search_target, Node *root);
 void replace_node(Node *replaced_node, Node *new_node);
+void replace_dependent(Node *replaced_node, Node *new_node);
+void replace_prev_dep(Node *replaced_node, Node *new_node);
+void replace_next_dep(Node *replaced_node, Node *new_node);
+void replace_targets(Node *replaced_node, Node *new_node);
 void postorder_traversal(char *target_name, Node *root);
 void DFS(Node *root); 
 

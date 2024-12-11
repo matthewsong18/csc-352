@@ -29,6 +29,7 @@ int test_replace_node();
 int test_update_tree();
 int test_multiple_updates();
 int test_postorder_traversal();
+int test_example();
 
 void run_test(const char *test_name, int (*test_func)()) {
   printf("Running %s...\n", test_name);
@@ -64,6 +65,7 @@ int main() {
   run_test("test_update_tree", test_update_tree);
   run_test("test_multiple_updates", test_multiple_updates);
   run_test("test_postorder_traversal", test_postorder_traversal);
+  run_test("test_example", test_example);
 
   printf("\033[32mAll Tests Passed\033[0m\n\n");
 
@@ -419,6 +421,32 @@ int test_replace_node() {
   assert(t2->prev_target == NULL);
   assert(t1->dependency == t2);
 
+  Node *root2 = NULL;
+  add_target("hash.o", &root2);
+  char *d2 = ": hash.c utils.h hash.h";
+  char *input2 = safe_strdup(d2);
+  add_dependencies(input2, root2, 0);
+
+  add_target("spellcheck", &root2);
+  char *d3 = ": hash.o spellcheck.o";
+  char *input3 = safe_strdup(d3);
+  add_dependencies(input3, root2, 0);
+
+  Node *hash = root2;
+  Node *dep_hash = root2->next_target->dependency;
+  root2 = root2->next_target;
+  replace_node(dep_hash, hash);
+
+  assert(strcmp("spellcheck", root2->target) == 0);
+  Node *dep = root2->dependency;
+  assert(strcmp("hash.o", dep->target) == 0);
+  Node *sub_dep = dep->dependency;
+  assert(strcmp("hash.c", sub_dep->target) == 0);
+  sub_dep = sub_dep->next_dep;
+  assert(strcmp("utils.h", sub_dep->target) == 0);
+  sub_dep = sub_dep->next_dep;
+  assert(strcmp("hash.h", sub_dep->target) == 0);
+
   return 1;
 }
 
@@ -472,11 +500,27 @@ int test_multiple_updates() {
   add_dependencies(input1, root, 0);
   update_tree(&root);
 
+  assert(root->dependency != NULL);
+  assert(strcmp("utils.h", root->dependency->target) == 0);
+  assert(root->dependency->next_dep != NULL);
+  assert(strcmp("spellcheck.h", root->dependency->next_dep->target) == 0);
+  assert(root->dependency->next_dep->next_dep != NULL);
+  assert(strcmp("spellcheck.c", root->dependency->next_dep->next_dep->target) ==
+         0);
+
   add_target("hash.o", &root);
   char *d2 = ": hash.c utils.h hash.h";
   char *input2 = safe_strdup(d2);
   add_dependencies(input2, root, 0);
   update_tree(&root);
+
+  assert(strcmp("hash.o", root->next_target->target) == 0);
+  Node *dep2 = root->next_target->dependency;
+  assert(strcmp("hash.c", dep2->target) == 0);
+  Node *sub_dep2 = dep2->next_dep;
+  assert(strcmp("utils.h", sub_dep2->target) == 0);
+  sub_dep2 = sub_dep2->next_dep;
+  assert(strcmp("hash.h", sub_dep2->target) == 0);
 
   add_target("spellcheck", &root);
   char *d3 = ": hash.o spellcheck.o";
@@ -487,9 +531,14 @@ int test_multiple_updates() {
   assert(strcmp("spellcheck", root->target) == 0);
   Node *dep = root->dependency;
   assert(strcmp("hash.o", dep->target) == 0);
+  Node *sub_dep = dep->dependency;
+  assert(strcmp("hash.c", sub_dep->target) == 0);
+  sub_dep = sub_dep->next_dep;
+  assert(strcmp("utils.h", sub_dep->target) == 0);
+  sub_dep = sub_dep->next_dep;
+  assert(strcmp("hash.h", sub_dep->target) == 0);
   dep = dep->next_dep;
   assert(strcmp("spellcheck.o", dep->target) == 0);
-  dep = dep->next_dep;
 
   return 1;
 }
@@ -513,6 +562,38 @@ int test_postorder_traversal() {
   update_tree(&root);
 
   postorder_traversal("target", root);
+
+  return 1;
+}
+
+int test_example() {
+  Node *root = NULL;
+  add_target("spellcheck.o", &root);
+  char *d1 = ": utils.h spellcheck.h spellcheck.c";
+  char *input1 = safe_strdup(d1);
+  add_dependencies(input1, root, 0);
+  update_tree(&root);
+
+  add_target("hash.o", &root);
+  char *d2 = ": hash.c utils.h hash.h";
+  char *input2 = safe_strdup(d2);
+  add_dependencies(input2, root, 0);
+  update_tree(&root);
+
+  add_target("spellcheck", &root);
+  char *d3 = ": hash.o spellcheck.o";
+  char *input3 = safe_strdup(d3);
+  add_dependencies(input3, root, 0);
+  update_tree(&root);
+
+  assert(strcmp("spellcheck", root->target) == 0);
+  Node *dep = root->dependency;
+  assert(strcmp("hash.o", dep->target) == 0);
+  dep = dep->next_dep;
+  assert(strcmp("spellcheck.o", dep->target) == 0);
+  dep = dep->next_dep;
+
+  postorder_traversal("spellcheck", root);
 
   return 1;
 }

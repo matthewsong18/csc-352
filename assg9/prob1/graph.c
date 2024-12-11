@@ -187,25 +187,33 @@ void add_dependency_at_end_of_list(Node *target, Node *dependency) {
 
 void update_tree(Node **root_addr) {
   Node *root = *root_addr;
-  Node *current = root;
-  while (current != NULL) {
-    Node *targets = root;
-    while (targets != NULL) {
-      Node *dupe = find_node(current, targets);
-      if (dupe != NULL) {
-        if (root->last_target == current) {
-          root->last_target = current->prev_target;
-        }
-        if (current == *root_addr) {
-          *root_addr = targets;
-          targets->last_target = current->last_target;
-        }
-        replace_node(dupe, current);
-      }
-      targets = targets->next_target;
-    }
-    current = current->next_target;
+  Node *search_target = root;
+  search_for_all_targets(search_target, root);
+}
+
+void search_for_all_targets(Node *search_target, Node *root) {
+  if (search_target == NULL) {
+    return;
   }
+
+  Node *targets = root;
+  Node *found_node = search_every_target(search_target, targets);
+  if (found_node != NULL) {
+    replace_node(found_node, search_target);
+  }
+
+  search_for_all_targets(search_target->next_target, root);
+}
+
+Node *search_every_target(Node *search_target, Node *targets) {
+  while (targets != NULL) {
+    Node *found_node = find_node(search_target, targets);
+    if (found_node != NULL) {
+      return found_node;
+    }
+    targets = targets->next_target;
+  }
+  return NULL;
 }
 
 Node *find_node(Node *search_target, Node *root) {
@@ -218,33 +226,53 @@ Node *find_node(Node *search_target, Node *root) {
     return root;
 
   Node *dependencies = root->dependency;
-  while (dependencies != NULL) {
-    Node *search = find_node(search_target, dependencies);
-    if (search != NULL)
-      return search;
-    dependencies = dependencies->next_dep;
-  }
+  search_dependencies(search_target, dependencies);
+  return NULL;
+}
+
+Node *search_dependencies(Node *search_target, Node *root) {
+  Node *search = find_node(search_target, root);
+  if (search != NULL)
+    return search;
+  search_dependencies(search_target, root->next_dep);
   return NULL;
 }
 
 void replace_node(Node *replaced_node, Node *new_node) {
+  replace_dependent(replaced_node, new_node);
+  replace_prev_dep(replaced_node, new_node);
+  replace_next_dep(replaced_node, new_node);
+  replace_targets(replaced_node, new_node);
+}
+
+void replace_dependent(Node *replaced_node, Node *new_node) {
   Node *dependent = replaced_node->dependent;
-  Node *prev = replaced_node->prev_dep;
-  Node *next = replaced_node->next_dep;
   if (dependent != NULL) {
     dependent->dependency = new_node;
     new_node->dependent = dependent;
   }
+}
+
+void replace_prev_dep(Node *replaced_node, Node *new_node) {
+  Node *prev = replaced_node->prev_dep;
   if (prev != NULL) {
     prev->next_dep = new_node;
     new_node->prev_dep = prev;
   }
+}
+
+void replace_next_dep(Node *replaced_node, Node *new_node) {
+  Node *next = replaced_node->next_dep;
   if (next != NULL) {
     next->prev_dep = new_node;
     new_node->next_dep = next;
   }
+}
+
+void replace_targets(Node *replaced_node, Node *new_node) {
   Node *prev_target = new_node->prev_target;
   Node *next_target = new_node->next_target;
+
   if (prev_target != NULL && next_target != NULL) {
     prev_target->next_target = next_target;
     next_target->prev_target = prev_target;
