@@ -2,10 +2,10 @@
 #define FILE_PARSER_H
 
 #include "graph.h"
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
 
 int is_blank_line(const char *line);
 int is_white_space(const char *line);

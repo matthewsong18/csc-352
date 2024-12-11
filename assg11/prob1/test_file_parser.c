@@ -16,8 +16,17 @@ int test_blank_line() {
   return 0;
 }
 
+int test_getting_movie_title() {
+  char *movie_line = "Movie: A Random Movie!";
+
+  assert(strcmp("A Random Movie!", get_movie_title(movie_line)) == 0);
+
+  return 0;
+}
+
 int main(void) {
   test_blank_line();
+  test_getting_movie_title();
 
   printf("All file_parser tests passed!");
   fflush(stdout);
