@@ -3,6 +3,16 @@
 
 #include "graph.h"
 
+typedef struct QueueNode {
+    ActorNode *actor;
+    struct QueueNode *next;
+} QueueNode;
+
+struct Queue {
+    QueueNode *front;
+    QueueNode *rear;
+};
+
 typedef struct Queue Queue;
 
 Queue *init_queue();
