@@ -49,7 +49,14 @@ int prompt_for_query(char **query) {
   size_t buffer_size = 0;
   ssize_t input_length = getline(query, &buffer_size, stdin);
 
-  return input_length != -1; // Return 0 if EOF is encountered
+  if (input_length == -1) {
+    // Free the allocated buffer if getline failed or EOF was encountered
+    free(*query);
+    *query = NULL;
+    return 0; // Return 0 to indicate EOF
+  }
+
+  return 1; // Return 1 to indicate successful input
 }
 
 /*
