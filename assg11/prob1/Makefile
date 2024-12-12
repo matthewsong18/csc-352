@@ -9,7 +9,7 @@ bacon: $(OBJ)
 bacon.o: bacon.c file_parser.h graph.h bfs.h utils.h
 	$(CC) $(CFLAGS) -c bacon.c
 
-file_parser.o: file_parser.c file_parser.h graph.h
+file_parser.o: file_parser.c file_parser.h
 	$(CC) $(CFLAGS) -c file_parser.c
 
 graph.o: graph.c graph.h
